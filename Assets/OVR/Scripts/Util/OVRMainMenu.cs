@@ -193,10 +193,6 @@ public class OVRMainMenu : MonoBehaviour
 	// of the menu RenderTarget
 	OVRGridCube GridCube = null;
 
-	// We want to hold onto the VisionGuide so we can share
-	// the menu RenderTarget
-	OVRVisionGuide VisionGuide = null;
-
 	#region MonoBehaviour Message Handlers
 	/// <summary>
 	/// Awake this instance.
@@ -334,12 +330,6 @@ public class OVRMainMenu : MonoBehaviour
 			// Add a GridCube component to this object
 			GridCube = gameObject.AddComponent<OVRGridCube>();
 			GridCube.SetOVRCameraController(ref CameraController);
-
-			// Add a VisionGuide component to this object
-			VisionGuide = gameObject.AddComponent<OVRVisionGuide>();
-			VisionGuide.SetOVRCameraController(ref CameraController);
-			VisionGuide.SetFadeTexture(ref FadeInTexture);
-			VisionGuide.SetVisionGuideLayer(ref LayerName);
 		}
 		
 		// Crosshair functionality
@@ -488,8 +478,7 @@ public class OVRMainMenu : MonoBehaviour
 			if (ScenesVisible || 
 			    ShowVRVars || 
 			    Crosshair.IsCrosshairVisible() || 
-			    RiftPresentTimeout > 0.0f || 
-			    VisionGuide.GetFadeAlphaValue() > 0.0f)
+			    RiftPresentTimeout > 0.0f)
 			{
 				GUIRenderObject.SetActive(true);
 			}
@@ -531,10 +520,6 @@ public class OVRMainMenu : MonoBehaviour
 		// The cross-hair may need to go away at some point, unless someone finds it 
 		// useful
 		Crosshair.OnGUICrosshair();
-		
-		// Since we want to draw into the main GUI that is shared within the MainMenu,
-		// we call the OVRVisionGuide GUI function here
-		VisionGuide.OnGUIVisionGuide();
 		
 		// Restore active render texture
 		if (GUIRenderObject.activeSelf)
@@ -649,12 +634,14 @@ public class OVRMainMenu : MonoBehaviour
         {
 			OVRDisplay.LatencyData latency = OVRManager.display.latency;
             if (latency.render < 0.000001f && latency.timeWarp < 0.000001f && latency.postPresent < 0.000001f)
-                strLatencies = System.String.Format("Ren : N/A TWrp: N/A PostPresent: N/A");
+                strLatencies = System.String.Format("Latency values are not available.");
             else
-                strLatencies = System.String.Format("Ren : {0:F3} TWrp: {1:F3} PostPresent: {2:F3}",
+                strLatencies = System.String.Format("R: {0:F3} TW: {1:F3} PP: {2:F3} RE: {3:F3} TWE: {4:F3}",
 					latency.render,
 					latency.timeWarp,
-					latency.postPresent);
+					latency.postPresent,
+					latency.renderError,
+					latency.timeWarpError);
         }
 #endif
     }

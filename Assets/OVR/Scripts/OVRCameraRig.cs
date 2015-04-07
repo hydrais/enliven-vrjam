@@ -19,8 +19,6 @@ limitations under the License.
 
 ************************************************************************************/
 
-//#define OVR_USE_PROJ_MATRIX
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -150,13 +148,6 @@ public class OVRCameraRig : MonoBehaviour
 			rightEyeCamera = ConfigureCamera(OVREye.Right);
 
 #if !UNITY_ANDROID || UNITY_EDITOR
-
-#if OVR_USE_PROJ_MATRIX
-			OVRManager.display.ForceSymmetricProj(false);
-#else
-			OVRManager.display.ForceSymmetricProj(true);
-#endif
-
 			needsCameraConfigure = false;
 #endif
 		}
@@ -316,12 +307,6 @@ public class OVRCameraRig : MonoBehaviour
 		// AA is documented to have no effect in deferred, but it causes black screens.
 		if (cam.actualRenderingPath == RenderingPath.DeferredLighting)
 			QualitySettings.antiAliasing = 0;
-
-#if !UNITY_ANDROID || UNITY_EDITOR
-#if OVR_USE_PROJ_MATRIX
-		cam.projectionMatrix = OVRManager.display.GetProjection((int)eye, cam.nearClipPlane, cam.farClipPlane);
-#endif
-#endif
 
 		return cam;
 	}

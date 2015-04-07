@@ -24,6 +24,7 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Text;
 using UnityEngine;
 using Ovr;
 
@@ -213,7 +214,7 @@ public class OVRManager : MonoBehaviour
 	{
 		get {
 #if !UNITY_ANDROID || UNITY_EDITOR
-			return capiHmd.GetHSWDisplayState().Displayed;
+			return (capiHmd.GetHSWDisplayState().Displayed != 0);
 #else
 			return false;
 #endif
@@ -423,6 +424,21 @@ public class OVRManager : MonoBehaviour
 	{
 		OVRPluginEvent.Issue(RenderEventType.Pause);
 	}
+
+	public delegate void VrApiEventDelegate( string eventData );
+
+	public static VrApiEventDelegate OnVrApiEvent = null;
+
+	public static void SetVrApiEventDelegate( VrApiEventDelegate d )
+	{
+		OnVrApiEvent = d;
+	}
+
+	// This is just an example of an event delegate.
+	public static void VrApiEventDefaultDelegate( string eventData )
+	{
+		Debug.Log( "VrApiEventDefaultDelegate: " + eventData );
+	}
 #else
 	private static bool ovrIsInitialized;
 	private static bool isQuitting;
@@ -452,9 +468,18 @@ public class OVRManager : MonoBehaviour
 		}
 
 		var netVersion = new System.Version(Ovr.Hmd.OVR_VERSION_STRING);
-		var ovrVersion = new System.Version(Ovr.Hmd.GetVersionString());
-		if (netVersion > ovrVersion)
-			Debug.LogWarning("Using an older version of LibOVR.");
+		System.Version ovrVersion = new System.Version("0.0.0");
+		var versionString = Ovr.Hmd.GetVersionString();
+		var success = false;
+		try {
+			ovrVersion = new System.Version(versionString);
+			success = true;
+		} catch (Exception e) {
+			Debug.Log("Failed to parse Oculus version string \"" + versionString + "\" with message \"" + e.Message + "\".");
+		}
+		if (!success || netVersion > ovrVersion)
+			Debug.LogWarning("Version check failed. Please make sure you are using Oculus runtime " +
+			                 Ovr.Hmd.OVR_VERSION_STRING + " or newer.");
 #endif
 
         // Detect whether this platform is a supported platform
@@ -472,6 +497,10 @@ public class OVRManager : MonoBehaviour
         }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
+
+		// log the unity version
+		Debug.Log( "Unity Version: " + Application.unityVersion );
+
 		// don't allow the application to run if orientation is not landscape left.
 		if (Screen.orientation != ScreenOrientation.LandscapeLeft)
 		{
@@ -520,7 +549,7 @@ public class OVRManager : MonoBehaviour
 			// Prepare for the RenderThreadInit()
 			SetInitVariables(activity.GetRawObject(), javaVrActivityClass.GetRawClass());
 
-#if !INHIBIT_ENTITLEMENT_CHECK
+#if USE_ENTITLEMENT_CHECK
 			AndroidJavaObject entitlementChecker = new AndroidJavaObject("com.oculus.svclib.OVREntitlementChecker");
 			entitlementChecker.CallStatic("doAutomatedCheck", activity);
 #else
@@ -563,52 +592,15 @@ public class OVRManager : MonoBehaviour
 		}
 #endif
 
-#if (UNITY_STANDALONE_WIN && (UNITY_4_6 || UNITY_4_5))
-		bool unity_4_6 = false;
-		bool unity_4_5_2 = false;
-		bool unity_4_5_3 = false;
-		bool unity_4_5_4 = false;
-		bool unity_4_5_5 = false;
-
-#if (UNITY_4_6)
-		unity_4_6 = true;
-#elif (UNITY_4_5_2)
-		unity_4_5_2 = true;
-#elif (UNITY_4_5_3)
-		unity_4_5_3 = true;
-#elif (UNITY_4_5_4)
-		unity_4_5_4 = true;
-#elif (UNITY_4_5_5)
-		unity_4_5_5 = true;
-#endif
-
-		// Detect correct Unity releases which contain the fix for D3D11 exclusive mode.
-		string version = Application.unityVersion;
-		int releaseNumber;
-		bool releaseNumberFound = Int32.TryParse(Regex.Match(version, @"\d+$").Value, out releaseNumber);
-
-		// Exclusive mode was broken for D3D9 in Unity 4.5.2p2 - 4.5.4 and 4.6 builds prior to beta 21
-		bool unsupportedExclusiveModeD3D9 = (unity_4_6 && version.Last(char.IsLetter) == 'b' && releaseNumberFound && releaseNumber < 21)
-			|| (unity_4_5_2 && version.Last(char.IsLetter) == 'p' && releaseNumberFound && releaseNumber >= 2)
-			|| (unity_4_5_3)
-			|| (unity_4_5_4);
-
-		// Exclusive mode was broken for D3D11 in Unity 4.5.2p2 - 4.5.5p2 and 4.6 builds prior to f1
-		bool unsupportedExclusiveModeD3D11 = (unity_4_6 && version.Last(char.IsLetter) == 'b')
-			|| (unity_4_5_2 && version.Last(char.IsLetter) == 'p' && releaseNumberFound && releaseNumber >= 2)
-			|| (unity_4_5_3)
-			|| (unity_4_5_4)
-			|| (unity_4_5_5 && version.Last(char.IsLetter) == 'f')
-			|| (unity_4_5_5 && version.Last(char.IsLetter) == 'p' && releaseNumberFound && releaseNumber < 3);
-
-		if (unsupportedExclusiveModeD3D9 && !display.isDirectMode && SystemInfo.graphicsDeviceVersion.Contains("Direct3D 9"))
+#if UNITY_STANDALONE_WIN
+		if (!OVRUnityVersionChecker.hasD3D9ExclusiveModeSupport && !display.isDirectMode && SystemInfo.graphicsDeviceVersion.Contains("Direct3D 9"))
 		{
 			MessageBox(0, "Direct3D 9 extended mode is not supported in this configuration. "
 				+ "Please use direct display mode, a different graphics API, or rebuild the application with a newer Unity version."
 				, "VR Configuration Warning", 0);
 		}
 
-		if (unsupportedExclusiveModeD3D11 && !display.isDirectMode && SystemInfo.graphicsDeviceVersion.Contains("Direct3D 11"))
+		if (!OVRUnityVersionChecker.hasD3D11ExclusiveModeSupport && !display.isDirectMode && SystemInfo.graphicsDeviceVersion.Contains("Direct3D 11"))
 		{
 			MessageBox(0, "Direct3D 11 extended mode is not supported in this configuration. "
 				+ "Please use direct display mode, a different graphics API, or rebuild the application with a newer Unity version."
@@ -700,6 +692,17 @@ public class OVRManager : MonoBehaviour
 #endif
 	}
 
+	public enum VrApiEventStatus
+	{
+		ERROR_INTERNAL = -2,		// queue isn't created, etc.
+		ERROR_INVALID_BUFFER = -1,	// the buffer passed in was invalid
+		NOT_PENDING = 0,			// no event is waiting
+		PENDING,					// an event is waiting
+		CONSUMED,					// an event was pending but was consumed internally
+		BUFFER_OVERFLOW,			// an event is being returned, but it could not fit into the buffer
+		INVALID_JSON				// there was an error parsing the JSON data
+	}
+
 	private void Update()
 	{
 		if (!usingPositionTrackingCached || usingPositionTracking != usePositionTracking)
@@ -778,9 +781,35 @@ public class OVRManager : MonoBehaviour
 		{
 			if (volumeControllerTransform == null)
 			{
-				volumeControllerTransform = gameObject.GetComponent<OVRCameraRig>().centerEyeAnchor;
+				if (gameObject.GetComponent<OVRCameraRig>() != null)
+				{
+					volumeControllerTransform = gameObject.GetComponent<OVRCameraRig>().centerEyeAnchor;
+				}
 			}
 			volumeController.UpdatePosition(volumeControllerTransform);
+		}
+
+		// Service VrApi events
+		// If this code is not called, internal VrApi events will never be pushed to the internal event queue.
+		{
+			Int32 maxDataSize = 4096;
+			StringBuilder sb = new StringBuilder( maxDataSize );
+			VrApiEventStatus pendingResult = (VrApiEventStatus)OVR_GetNextPendingEvent( sb, (uint)maxDataSize );
+			while ( pendingResult >= VrApiEventStatus.PENDING )
+			{
+				if ( pendingResult == VrApiEventStatus.PENDING )
+				{
+					if ( OnVrApiEvent != null )
+					{
+						OnVrApiEvent( sb.ToString() );
+					}
+					else
+					{
+						Debug.Log( "No OnVrApiEvent delegate set!" );
+					}
+				}
+				pendingResult = (VrApiEventStatus)OVR_GetNextPendingEvent( sb, (uint)maxDataSize );
+			}
 		}
 #endif
 	}
@@ -975,5 +1004,7 @@ public class OVRManager : MonoBehaviour
 	private static extern bool OVR_GetPlayerEyeHeight(ref float eyeHeight);
 	[DllImport(LibOVR)]
 	private static extern bool OVR_GetInterpupillaryDistance(ref float interpupillaryDistance);
+	[DllImport(LibOVR)]
+	private static extern int OVR_GetNextPendingEvent( StringBuilder sb, uint bufferSize );
 #endif
 }

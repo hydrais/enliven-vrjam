@@ -92,11 +92,6 @@ public class OVRModeParms : MonoBehaviour
 		// NOTE: some of the buttons defined in OVRGamepadController.Button are not available on the Android game pad controller
 		if ( Input.GetButtonDown(OVRGamepadController.ButtonNames[(int)resetButton])) 
 		{
-			//*************************
-			// Dynamically change VrModeParms cpu and gpu level.
-			// NOTE: Reset will cause 1 frame of flicker as it leaves
-			// and re-enters Vr mode.
-			//*************************
 #if (UNITY_ANDROID && !UNITY_EDITOR)
 			OVR_VrModeParms_SetCpuLevel(0);
 			OVR_VrModeParms_SetGpuLevel(1);

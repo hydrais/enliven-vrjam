@@ -86,11 +86,7 @@ public class OVRPlayerController : MonoBehaviour
 	private float FallSpeed = 0.0f;
 	private OVRPose? InitialPose;
 	private float InitialYRotation = 0.0f;
-#if UNITY_ANDROID
-	private float MoveScaleMultiplier = 2.0f;
-#else
 	private float MoveScaleMultiplier = 1.0f;
-#endif
 	private float RotationScaleMultiplier = 1.0f;
 	private bool  SkipMouseRotation = false;
 	private bool  HaltUpdateMovement = false;
@@ -254,11 +250,9 @@ public class OVRPlayerController : MonoBehaviour
 		// Compute this for key movement
 		float moveInfluence = Acceleration * 0.1f * MoveScale * MoveScaleMultiplier;
 
-#if !UNITY_ANDROID || UNITY_EDITOR
 		// Run!
 		if (dpad_move || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
 			moveInfluence *= 2.0f;
-#endif
 
 		Quaternion ort = transform.rotation;
 		Vector3 ortEuler = ort.eulerAngles;
@@ -276,7 +270,6 @@ public class OVRPlayerController : MonoBehaviour
 
 		Vector3 euler = transform.rotation.eulerAngles;
 
-#if !UNITY_ANDROID || UNITY_EDITOR
 		bool curHatLeft = OVRGamepadController.GPC_GetButton(OVRGamepadController.Button.LeftShoulder);
 
 		if (curHatLeft && !prevHatLeft)
@@ -297,7 +290,6 @@ public class OVRPlayerController : MonoBehaviour
 
 		if (Input.GetKeyDown(KeyCode.E))
 			euler.y += RotationRatchet;
-#endif
 
 		float rotateInfluence = SimulationRate * Time.deltaTime * RotationAmount * RotationScaleMultiplier;
 

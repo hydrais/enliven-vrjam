@@ -32,7 +32,7 @@ public class OVRVolumeControl : MonoBehaviour
 	
 	private Transform			myTransform = null;
 	
-	void Start ()
+	void Start()
 	{
 		DontDestroyOnLoad( gameObject );
 		myTransform = transform;
