@@ -15,10 +15,13 @@ public class EnemyBehavior : MonoBehaviour {
     Transform target;
     Transform myTransform;
     float deathTimer;
+    OSPAudioSource audioSource;
+    bool audioSourcePlayed = false;
 
     void Awake()
     {
         myTransform = transform;
+        audioSource = GetComponent<OSPAudioSource>();
     }
 
     void Start()
@@ -27,9 +30,6 @@ public class EnemyBehavior : MonoBehaviour {
         trackTarget = false;
         //audio = GetComponent<TBE_3DCore.TBE_Source>();
         startTime = Time.time;
-        MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        cubeMaterial = (meshRenderer.materials[0]);
-        color = cubeMaterial.color;
         target = GameObject.FindWithTag("Player").transform;
     }
 
@@ -56,13 +56,9 @@ public class EnemyBehavior : MonoBehaviour {
         }
         if (visible)
         {
-            color = Color.Lerp(color, Color.red, 0.01f);
-            cubeMaterial.SetColor("_Color", color);
         }
         else
         {
-            color = Color.Lerp(color, Color.white, 0.01f);
-            cubeMaterial.SetColor("_Color", color);
         }
     }
 
@@ -84,6 +80,10 @@ public class EnemyBehavior : MonoBehaviour {
         myTransform.rotation = Quaternion.Slerp(myTransform.rotation,
         Quaternion.LookRotation(target.position - myTransform.position), rotationSpeed * Time.deltaTime);
 
+        if (Vector3.Distance(target.position,myTransform.position) < 5 && !audioSourcePlayed){
+            audioSource.Play();
+            audioSourcePlayed = true;
+        }
         myTransform.position += myTransform.forward * moveSpeed * Time.deltaTime;
     }
 
