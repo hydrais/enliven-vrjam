@@ -8,4 +8,8 @@ public class FollowPlayer : MonoBehaviour {
 		NavMeshAgent navMeshAgent = GetComponent<NavMeshAgent> ();
 		navMeshAgent.destination = Player.transform.position;
 	}
+
+	public void Kill () {
+		this.Destroy (this.gameObject);
+	}
 }
