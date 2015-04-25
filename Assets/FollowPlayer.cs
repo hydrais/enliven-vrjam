@@ -14,6 +14,11 @@ public class FollowPlayer : MonoBehaviour {
         if (!dead)
         {
             EnemyMeshAgent.destination = Player.transform.position;
+            var distance = Vector3.Distance(Player.transform.position, transform.position);
+            if (distance < 5f)
+            {
+                GetComponent<Animation>().Play("runBite");
+            }
         }
         else
         {
@@ -22,9 +27,11 @@ public class FollowPlayer : MonoBehaviour {
 	}
 
 	public void Kill () {
-        dead = true;
-        GetComponent<Animator>().Play("dead");
-        GetComponent<AudioSource>().Stop();
-		//Destroy(this.gameObject);
+        if (!dead)
+        {
+            dead = true;
+            GetComponent<Animation>().Play("death");
+            GetComponent<AudioSource>().Stop();
+        }
 	}
 }
