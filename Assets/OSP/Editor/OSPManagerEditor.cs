@@ -60,8 +60,8 @@ public class OSPManagerEditor : Editor
 		{
 #if CUSTOM_LAYOUT
 			Separator();
-			m_Component.Bypass  = EditorGUILayout.Toggle("Bypass",   m_Component.Bypass);
-			m_Component.UseFast = EditorGUILayout.Toggle("Use Fast", m_Component.UseFast);
+			m_Component.Bypass    = EditorGUILayout.Toggle("Bypass",   m_Component.Bypass);
+			m_Component.UseSimple = EditorGUILayout.Toggle("Use Simple", m_Component.UseSimple);
 
 			Separator();
 			GUI.color = HColor;
@@ -73,8 +73,7 @@ public class OSPManagerEditor : Editor
 			GUI.color = HColor;
 			Label ("Gain (Range: -/+24 Decibels)");
 			GUI.color = Color.white;
-			m_Component.GainHQ   = EditorGUILayout.FloatField("HQ",   m_Component.GainHQ);
-			m_Component.GainFast = EditorGUILayout.FloatField("Fast", m_Component.GainFast);
+			m_Component.Gain   = EditorGUILayout.FloatField(" ",      m_Component.Gain);
 
 			Separator();
 			GUI.color = HColor;
@@ -85,16 +84,21 @@ public class OSPManagerEditor : Editor
 			m_Component.EnableReverb = EditorGUILayout.Toggle("Reverb On", m_Component.EnableReverb);
 			Label ("");
 			GUI.color = HColor;
-			Label("Room Dimensions (Range: 0 - 230 meters)");
+			Label("Room Dimensions (Range: 1 - 200 meters)");
 			GUI.color = Color.white;
 			m_Component.Dimensions = EditorGUILayout.Vector3Field("",  m_Component.Dimensions);
 			Label ("");
 			GUI.color = HColor;
-			Label("Reflection Values (Range: 0 - 0.95)");
+			Label("Reflection Values (Range: 0 - 0.97)");
 			GUI.color = Color.white;
 			m_Component.RK01 = EditorGUILayout.Vector2Field("Left/Right",     m_Component.RK01);
 			m_Component.RK23 = EditorGUILayout.Vector2Field("Up/Down",        m_Component.RK23);
 			m_Component.RK45 = EditorGUILayout.Vector2Field("Behind/Front",       m_Component.RK45);
+			Label ("");
+			GUI.color = HColor;
+			Label("Reflection Gain (Range: 100 - 100000 meters)");
+			GUI.color = Color.white;
+			m_Component.ReflRangeMax   = EditorGUILayout.FloatField(" ", m_Component.ReflRangeMax);
 
 			Separator();
 /*

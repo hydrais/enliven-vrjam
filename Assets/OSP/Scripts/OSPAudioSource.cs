@@ -68,19 +68,11 @@ public class OSPAudioSource : MonoBehaviour
 	}
 
 	[SerializeField]
-	private bool bassBoost = false;
-	public  bool BassBoost
+	private bool useSimple = false;
+	public  bool UseSimple
 	{
-		get{return bassBoost; }
-		set{bassBoost = value;}
-	}
-
-	[SerializeField]
-	private bool useFast = false;
-	public  bool UseFast
-	{
-		get{return useFast; }
-		set{useFast = value;}
+		get{return useSimple; }
+		set{useSimple = value;}
 	}
 
 	// Private members
@@ -159,26 +151,35 @@ public class OSPAudioSource : MonoBehaviour
 			// and native 2D panning
 			if((Bypass == true) || (OSPManager.GetBypass() == true))
 			{
+#if (!UNITY_5_0)
+				audio.panLevel = panLevel;
+#else
 				GetComponent<AudioSource>().spatialBlend = panLevel;
+#endif
 				GetComponent<AudioSource>().spread   = spread;
 			}
 			else
 			{
+#if (!UNITY_5_0)
+				audio.panLevel = sSetPanLevel;
+#else
 				GetComponent<AudioSource>().spatialBlend = sSetPanLevel;
+#endif
 				GetComponent<AudioSource>().spread   = sSetSpread;
 			}
 
-			// Update BassBoost and FrequencyHints
+			// Update FrequencyHints
 			// Optimize: Do not do this if context doesn't exist
 			if(context != sNoContext)
 			{
-				OSPManager.SetBassBoost(context, bassBoost);
 				OSPManager.SetFrequencyHint(context, frequencyHint);
 			}
 
 			// return the context when the sound has finished playing
 			if((GetComponent<AudioSource>().time >= GetComponent<AudioSource>().clip.length) && (GetComponent<AudioSource>().loop == false))
 			{
+				// One last pass to allow for the tail portion of the sound
+				// to finish
 				drainTime = OSPManager.GetDrainTime(context);
 				drain     = true;
 			}
@@ -220,7 +221,10 @@ public class OSPAudioSource : MonoBehaviour
 					drain = false;
 
 					lock (this) isPlaying = false;
-					Release();
+					// Stop will both stop audio from playing (keeping OnAudioFilterRead from 
+					// running with a held audio source) as well as release the spatialization
+					// resources via Release()
+					Stop(); 
 				}
 			}
 		}
@@ -245,21 +249,25 @@ public class OSPAudioSource : MonoBehaviour
 		if(!AudioSourceExists())return;
 
 		// Cache pan and spread
+#if (!UNITY_5_0)
+		panLevel = audio.panLevel;
+#else
 		panLevel = GetComponent<AudioSource>().spatialBlend;
+#endif
 		spread = GetComponent<AudioSource>().spread;
 		
-		// override to use fast spatializer
-		bool prevUseFast = OSPManager.GetUseFast();
+		// override to use simple spatializer
+		bool prevUseSimple = OSPManager.GetUseSimple();
 
-		if(useFast == true) 
-			OSPManager.SetUseFast (useFast); 
+		if(useSimple == true) 
+			OSPManager.SetUseSimple (useSimple); 
 	
 		// Reserve a context in OSP that will be used for spatializing sound
 		// (Don't grab a new one if is already has a context attached to it)
 		if(context == sNoContext)
 			context = OSPManager.AquireContext ();
 
-		OSPManager.SetUseFast (prevUseFast); // reset 
+		OSPManager.SetUseSimple (prevUseSimple); // reset 
 
 		// We don't have a context here, so bail
 		if(context == sNoContext)
@@ -267,7 +275,11 @@ public class OSPAudioSource : MonoBehaviour
 
 		// Set pan to full (spread at 180 will keep attenuation curve working, but all 2D
 		// panning will be removed)
+#if (!UNITY_5_0)
+		audio.panLevel = sSetPanLevel;
+#else
 		GetComponent<AudioSource>().spatialBlend = sSetPanLevel;
+#endif
 
 		// set spread to 180
 		GetComponent<AudioSource>().spread = sSetSpread;
@@ -279,7 +291,11 @@ public class OSPAudioSource : MonoBehaviour
 		if(!AudioSourceExists())return;
 
 		// Reset all audio variables that were changed during play
+#if (!UNITY_5_0)
+		audio.panLevel = panLevel;
+#else
 		GetComponent<AudioSource>().spatialBlend = panLevel;
+#endif
 		GetComponent<AudioSource>().spread   = spread;
 
 		// Put context back into pool
@@ -295,7 +311,16 @@ public class OSPAudioSource : MonoBehaviour
 	{
 		// Find the audio listener (first time used)
 		if(audioListener == null)
+		{
 			audioListener = FindObjectOfType<AudioListener>();
+
+			// If still null, then we have a problem;
+			if(audioListener == null)
+			{
+				Debug.LogWarning ("SetRelativeSoundPos - Warning: No AudioListener present");
+				return;
+			}
+		}
 
 		// Get the location of this sound
 		Vector3 sp    = transform.position;
@@ -424,7 +449,7 @@ public class OSPAudioSource : MonoBehaviour
 	/// <summary>
 	/// Stop this instance.
 	/// </summary>
-	void Stop()
+	public void Stop()
 	{
 		if(!AudioSourceExists())
 		{
@@ -441,6 +466,21 @@ public class OSPAudioSource : MonoBehaviour
 		// Return spatializer context
 		Release();
 	}
+
+	/// <summary>
+	/// Pause this instance.
+	/// </summary>
+	public void Pause()
+	{
+		if(!AudioSourceExists())
+		{
+			Debug.LogWarning ("Pause - Warning: No AudioSource on GameObject");
+			return;
+		}
+
+		GetComponent<AudioSource>().Pause ();
+	}
+
 
 	//* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	// OnAudioFilterRead (separate thread)
@@ -515,7 +555,9 @@ public class OSPAudioSource : MonoBehaviour
 	bool AudioSourceExists()
 	{
 		if(GetComponent<AudioSource>() == null) 
+		{
 			return false;
+		}
 
 		return true;
 	}

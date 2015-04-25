@@ -64,6 +64,8 @@ public class OSPManager : MonoBehaviour
 	[DllImport(strOSP)]
     private static extern bool OSP_UpdateRoomModel(ref RoomModel rm);
 	[DllImport(strOSP)]
+	private static extern void OSP_SetReflectionsRangeMax(float range);
+	[DllImport(strOSP)]
 	private static extern int  OSP_AquireContext();
 	[DllImport(strOSP)]
 	private static extern void OSP_ReturnContext(int context);
@@ -72,17 +74,13 @@ public class OSPManager : MonoBehaviour
 	[DllImport(strOSP)]
 	private static extern void OSP_SetBypass(bool bypass);
 	[DllImport(strOSP)]
-	private static extern bool OSP_GetUseFast();
+	private static extern bool OSP_GetUseSimple();
 	[DllImport(strOSP)]
-	private static extern void OSP_SetUseFast(bool useFast);
+	private static extern void OSP_SetUseSimple(bool useSimple);
 	[DllImport(strOSP)]
 	private static extern void OSP_SetGlobalScale(float globalScale);
 	[DllImport(strOSP)]
-	private static extern void OSP_SetGainHQ(float gain);
-	[DllImport(strOSP)]
-	private static extern void OSP_SetGainFast(float gain);
-	[DllImport(strOSP)]
-	private static extern void OSP_SetBassBoost(int context, bool boost);
+	private static extern void OSP_SetGain(float gain);
 	[DllImport(strOSP)]
 	private static extern void OSP_SetFrequencyHint(int context, int hint);
 	[DllImport(strOSP)]
@@ -118,12 +116,12 @@ public class OSPManager : MonoBehaviour
 	}
 
 	[SerializeField]
-	private bool useFast = false;
-	public  bool UseFast
+	private bool useSimple = false;
+	public  bool UseSimple
 	{
-		get{ return useFast; }
-		set{useFast = value; 
-			OSP_SetUseFast(useFast);}
+		get{ return useSimple; }
+		set{useSimple = value; 
+			OSP_SetUseSimple(useSimple);}
 	}
 	
 	[SerializeField]
@@ -136,21 +134,12 @@ public class OSPManager : MonoBehaviour
 	}
 	
 	[SerializeField]
-	private float gainHQ = 0.0f;
-	public  float GainHQ
+	private float gain = 0.0f;
+	public  float Gain
 	{
-		get{return gainHQ; }
-		set{gainHQ = Mathf.Clamp(value, -24.0f, 24.0f); 
-			OSP_SetGainHQ(gainHQ);}
-	}
-
-	[SerializeField]
-	private float gainFast = 0.0f;
-	public  float GainFast
-	{
-		get{return gainFast; }
-		set{gainFast = Mathf.Clamp(value, -24.0f, 24.0f); 
-			OSP_SetGainFast(gainFast);}
+		get{return gain; }
+		set{gain = Mathf.Clamp(value, -24.0f, 24.0f); 
+			OSP_SetGain(gain);}
 	}
 
 	//----------------------
@@ -179,9 +168,9 @@ public class OSPManager : MonoBehaviour
 	{
 		get{return dimensions; }
 		set{dimensions = value; 
-			dimensions.x = Mathf.Clamp (dimensions.x, 0.0f, 230.0f);
-			dimensions.y = Mathf.Clamp (dimensions.y, 0.0f, 230.0f);
-			dimensions.z = Mathf.Clamp (dimensions.z, 0.0f, 230.0f);
+			dimensions.x = Mathf.Clamp (dimensions.x, 1.0f, 200.0f);
+			dimensions.y = Mathf.Clamp (dimensions.y, 1.0f, 200.0f);
+			dimensions.z = Mathf.Clamp (dimensions.z, 1.0f, 200.0f);
 			dirtyReflection = true;}
 	}
 
@@ -191,8 +180,8 @@ public class OSPManager : MonoBehaviour
 	{
 		get{return rK01; }
 		set{rK01 = value; 
-			rK01.x = Mathf.Clamp (rK01.x, 0.0f, 0.95f);
-			rK01.y = Mathf.Clamp (rK01.y, 0.0f, 0.95f);
+			rK01.x = Mathf.Clamp (rK01.x, 0.0f, 0.97f);
+			rK01.y = Mathf.Clamp (rK01.y, 0.0f, 0.97f);
 			dirtyReflection = true;}
 	}
 
@@ -218,12 +207,18 @@ public class OSPManager : MonoBehaviour
 			dirtyReflection = true;}
 	}
 
+	// reflection range max does not need to have a dirty update
+	[SerializeField]
+	private float reflRangeMax = 10000.0f;
+	public  float ReflRangeMax
+	{
+		get{return reflRangeMax; }
+		set{reflRangeMax = Mathf.Clamp(value, 100.0f, 100000.0f); 
+			OSP_SetReflectionsRangeMax(reflRangeMax);}
+	}
+
 	// * * * * * * * * * * * * *
 	// Private members
-#if (UNITY_ANDROID && !UNITY_EDITOR)
-	private int GUISampleRate;
-	private int GUIBufferSize;
-#endif
 	
 	// * * * * * * * * * * * * *
     // Static members
@@ -240,7 +235,7 @@ public class OSPManager : MonoBehaviour
 		int samplerate;
 		int bufsize;
 		int numbuf;
-
+#if (!UNITY_5_0)
 		// Used to override samplerate and buffer size with optimal values
 		bool setvalues = true;
 
@@ -248,7 +243,7 @@ public class OSPManager : MonoBehaviour
 #if (UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX)
 		setvalues = false;
 #endif
-
+#endif
 		// Get the current sample rate
 		samplerate = AudioSettings.outputSampleRate;
 		// Get the current buffer size and number of buffers
@@ -257,13 +252,12 @@ public class OSPManager : MonoBehaviour
 		Debug.LogWarning (System.String.Format ("OSP: Queried SampleRate: {0:F0} BufferSize: {1:F0}", samplerate, bufsize));
 
 #if (UNITY_ANDROID && !UNITY_EDITOR)
-		GUISampleRate = samplerate;
-		GUIBufferSize = bufsize;
-
 		if((samplerate == 48000) && (bufsize == 960))
 		{
 			Debug.LogWarning("OSP: Native OpenSL ENABLED");
+#if (!UNITY_5_0)
 			setvalues = false;
+#endif
 		}
 		else
 		{
@@ -271,8 +265,17 @@ public class OSPManager : MonoBehaviour
 		}
 #endif
 
+// We will only set values IF we are not Unity 5 (the ability to set DSP settings does not exist)
+// NOTE: Unity 4 does not switch DSP buffer sizes using ProjectSettings->Audio, but Unity 5 does.
+// At some point along Unity 5 maturity, the functionality to set DSP values directly might be removed.
+#if (!UNITY_5_0)
 		if(setvalues == true)
 		{
+// NOTE: When setting DSP values in Unity 4, there may be a situation where using PlayOnAwake on 
+// non-spatitalized audio objects will fail to play.
+// Uncomment this code for achieving the best possibly latency with spatialized audio, but
+// USE AT YOUR OWN RISK!
+/*
 			// Set the ideal sample rate
 			AudioSettings.outputSampleRate = SampleRate;
 			// Get the sample rate again (it may not take, depending on platform)
@@ -281,7 +284,9 @@ public class OSPManager : MonoBehaviour
 			AudioSettings.SetDSPBufferSize (BufferSize, numbuf);
 			// Get the current buffer size and number of buffers again
 			AudioSettings.GetDSPBufferSize (out bufsize, out numbuf);
-		}
+*/
+	}
+#endif
 
 		Debug.LogWarning (System.String.Format ("OSP: sample rate: {0:F0}", samplerate));
 		Debug.LogWarning (System.String.Format ("OSP: buffer size: {0:F0}", bufsize));
@@ -290,11 +295,11 @@ public class OSPManager : MonoBehaviour
 		sOSPInit = OSP_Init(samplerate, bufsize);
 
 		// Set global variables not set to dirty updates
-		OSP_SetBypass      (bypass);
-		OSP_SetUseFast     (useFast);
-		OSP_SetGlobalScale (globalScale);
-		OSP_SetGainHQ      (gainHQ);
-		OSP_SetGainFast    (gainFast);
+		OSP_SetBypass             (bypass);
+		OSP_SetUseSimple          (useSimple);
+		OSP_SetGlobalScale        (globalScale);
+		OSP_SetGain               (gain);
+		OSP_SetReflectionsRangeMax(reflRangeMax);
 
 		// Update reflections for the first time
 		dirtyReflection = true;
@@ -330,18 +335,7 @@ public class OSPManager : MonoBehaviour
         // PGG Do not call, faster (but stuck with initial buffer resolution)
 		//OSP_Exit();
 	}
-
-
-	// OnGUI
-	void OnGUI()
-	{
-#if (UNITY_ANDROID && !UNITY_EDITOR)
-//		GUI.Box (new Rect (0,Screen.height - Screen.height/5,Screen.width/4,Screen.height/5), 
-//		            System.String.Format ("SampRate: {0:F0} \nBufSize: {1:F0}", 
-//		            GUISampleRate, GUIBufferSize));
-#endif
-	}
-
+		
 	// * * * * * * * * * * * * *
 	// Public Functions
 	
@@ -384,33 +378,22 @@ public class OSPManager : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Gets the fast override.
+	/// Gets the sinple override.
 	/// </summary>
 	/// <returns><c>true</c>, if fast override was used, <c>false</c> otherwise.</returns>
-	/// <param name="useFast">If set to <c>true</c> use fast.</param>
-	public static bool GetUseFast()
+	/// <param name="useSimple">If set to <c>true</c> use simple.</param>
+	public static bool GetUseSimple()
 	{
-		return OSP_GetUseFast();
+		return OSP_GetUseSimple();
 	}
 
 	/// <summary>
-	/// Sets the use fast.
+	/// Sets the use simple.
 	/// </summary>
-	/// <returns><c>true</c>, if use fast was gotten, <c>false</c> otherwise.</returns>
-	public static void SetUseFast(bool use)
+	/// <returns><c>true</c>, if use simple was gotten, <c>false</c> otherwise.</returns>
+	public static void SetUseSimple(bool use)
 	{
-		OSP_SetUseFast(use);
-	}
-
-	
-	/// <summary>
-	/// Sets the bass boost.
-	/// </summary>
-	/// <param name="context">Context.</param>
-	/// <param name="boost">If set to <c>true</c> boost.</param>
-	public static void SetBassBoost(int context, bool boost)
-	{
-		OSP_SetBassBoost (context, boost);
+		OSP_SetUseSimple(use);
 	}
 
 	/// <summary>

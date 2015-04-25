@@ -64,8 +64,7 @@ public class OSPAudioSourceEditor : Editor
 			Separator();
             m_Component.Bypass      = EditorGUILayout.Toggle("Bypass", m_Component.Bypass);
 			m_Component.PlayOnAwake = EditorGUILayout.Toggle("Play On Awake", m_Component.PlayOnAwake);
-			m_Component.BassBoost   = EditorGUILayout.Toggle("Bass Boost", m_Component.BassBoost);
-			m_Component.UseFast     = EditorGUILayout.Toggle("Use Fast Override", m_Component.UseFast);
+			m_Component.UseSimple   = EditorGUILayout.Toggle("Use Simple Override", m_Component.UseSimple);
 			
 			Separator();
 			m_Component.Priority = EditorGUILayout.IntField("Priority (0 - 10)", m_Component.Priority); 
