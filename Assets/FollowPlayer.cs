@@ -3,6 +3,7 @@ using System.Collections;
 
 public class FollowPlayer : MonoBehaviour {
 	public GameObject Player;
+	public bool debugMode;
     private NavMeshAgent EnemyMeshAgent;
     private bool dead = false;
 
@@ -33,5 +34,18 @@ public class FollowPlayer : MonoBehaviour {
             GetComponent<Animation>().Play("death");
             GetComponent<AudioSource>().Stop();
         }
+	}
+
+	public void AttackPlayer()
+	{
+		if (debugMode) {
+			Destroy(this.gameObject);
+		}
+	}
+
+	void OnCollisionEnter(Collision collision) {
+		if (collision.gameObject.tag == "Cart" || collision.gameObject.tag == "Player") {
+			AttackPlayer();
+		}
 	}
 }
