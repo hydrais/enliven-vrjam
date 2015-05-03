@@ -1,15 +1,27 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
 public class Enemy : MonoBehaviour {
-	public GameObject Player;
+	public event EventHandler Vanquished;
 
-	void Start () {
-		
+	public Layer CurrentLayer;
+
+	private NavMeshAgent navMeshAgent;
+	
+	void Start ()
+	{
+		this.navMeshAgent = GetComponent<NavMeshAgent> ();
 	}
 
-	void Update () {
-		var playerPosition = Player.transform.position;
-		this.transform.position = playerPosition + new Vector3 (0, 5, 5);
+	public void Vanquish ()
+	{
+		this.Vanquished (this, null);
+		Destroy (this.gameObject);
+	}
+	
+	public void MoveTo (Vector3 destination)
+	{
+		this.navMeshAgent.destination = destination;
 	}
 }

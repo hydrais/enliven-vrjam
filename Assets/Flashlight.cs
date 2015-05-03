@@ -1,34 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class RayCast : MonoBehaviour {
+public class Flashlight : MonoBehaviour {
 	private RaycastHit hit;
 
 	public string EnemyTag = "Enemy";
 
 	public int Distance = 50;
-    private Light Flashlight;
+
+    private Light Light;
 
     void Start()
     {
-        Flashlight = GetComponent<Light>();
+        Light = GetComponent<Light>();
     }
 	
 	void Update () {
 
         if (Input.GetButtonDown("Mouse 0"))
         {
-            Flashlight.enabled = true;
+            Light.enabled = true;
         }
         if (Input.GetButtonUp("Mouse 0"))
         {
-            Flashlight.enabled = false;
+            Light.enabled = false;
         }
         if (Input.GetButton("Mouse 1"))
         {
             Application.LoadLevel(0);
         }
-        if (Flashlight.enabled)
+        if (Light.enabled)
         {
             Vector3 forward = transform.TransformDirection(Vector3.forward);
             if (Physics.Raycast(this.transform.position, forward, out hit, Distance))
@@ -42,11 +43,8 @@ public class RayCast : MonoBehaviour {
 	}
 	
 	private void handleHit (GameObject gameObject) {
-        
 		if (gameObject.tag == EnemyTag) {
-            
-			// TODO: Run custom code to kill the enemy, as demonstrated...
-			gameObject.GetComponent<FollowPlayer>().Kill();
+			gameObject.GetComponent<Enemy>().Vanquish();
 		}
 	}
 }
