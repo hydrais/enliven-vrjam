@@ -9,10 +9,12 @@ public class Flashlight : MonoBehaviour {
 	public int Distance = 50;
 
     private Light Light;
+	private OSPAudioSource LightSwitch;
 
     void Start()
     {
         Light = GetComponent<Light>();
+		LightSwitch = GetComponent<OSPAudioSource> ();
     }
 	
 	void Update () {
@@ -20,6 +22,7 @@ public class Flashlight : MonoBehaviour {
         if (Input.GetButtonDown("Mouse 0"))
         {
             Light.enabled = true;
+			LightSwitch.Play();
         }
         if (Input.GetButtonUp("Mouse 0"))
         {

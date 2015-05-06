@@ -93,7 +93,7 @@ public class EnemyController : MonoBehaviour
 
 	private LayerDiceRoll RollLayerDice ()
 	{
-		var random = new System.Random ().Next (0, 100);
+		var random = UnityEngine.Random.Range (0, 10000);
 
 		if (random <= 10) 
 		{
@@ -103,7 +103,7 @@ public class EnemyController : MonoBehaviour
 		{
 			return LayerDiceRoll.Advance;
 		} 
-		else if (random > 80) 
+		else if (random > 80 && random <= 100) 
 		{
 			return LayerDiceRoll.Hold;
 		}
@@ -147,7 +147,7 @@ public class EnemyController : MonoBehaviour
 			max = 55;
 		}
 
-		return new System.Random ().Next (min, max);
+		return UnityEngine.Random.Range (min, max);
 	}
 
 	private Vector3 GetEnemyPosition (Vector3 playerPosition, int range, int angle)
@@ -165,6 +165,6 @@ public class EnemyController : MonoBehaviour
 
 	private int GetDirection ()
 	{
-		return new System.Random ().Next (0, 360);
+		return UnityEngine.Random.Range (0, 360);
 	}
 }
