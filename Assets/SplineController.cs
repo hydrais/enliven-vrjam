@@ -18,11 +18,11 @@ public class SplineController : MonoBehaviour
 
 
 	SplineInterpolator mSplineInterp;
-	public Transform[] mTransforms;
+	Transform[] mTransforms;
 
 	void OnDrawGizmos()
 	{
-		Transform[] trans = mTransforms;
+		Transform[] trans = GetTransforms();
 		if (trans.Length < 2)
 			return;
 
@@ -47,6 +47,8 @@ public class SplineController : MonoBehaviour
 	void Start()
 	{
 		mSplineInterp = GetComponent(typeof(SplineInterpolator)) as SplineInterpolator;
+
+		mTransforms = GetTransforms();
 
 		if (HideOnExecute)
 			DisableTransforms();
@@ -130,7 +132,7 @@ public class SplineController : MonoBehaviour
 		if (mTransforms.Length > 0)
 		{
 			SetupSplineInterpolator(mSplineInterp, mTransforms);
-			mSplineInterp.StartInterpolation(null, false, WrapMode);
+			mSplineInterp.StartInterpolation(null, true, WrapMode);
 		}
 	}
 }
