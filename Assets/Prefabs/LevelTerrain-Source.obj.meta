@@ -18,12 +18,15 @@ ModelImporter:
     2300000: LevelTerrain-BaseMesh_MeshPart0
     2300002: LevelTerrain-BaseMesh_MeshPart1
     2300004: LevelTerrain-BaseMesh_MeshPart2
+    2300006: LevelTerrain-BaseMesh
     3300000: LevelTerrain-BaseMesh_MeshPart0
     3300002: LevelTerrain-BaseMesh_MeshPart1
     3300004: LevelTerrain-BaseMesh_MeshPart2
+    3300006: LevelTerrain-BaseMesh
     4300000: LevelTerrain-BaseMesh_MeshPart0
     4300002: LevelTerrain-BaseMesh_MeshPart1
     4300004: LevelTerrain-BaseMesh_MeshPart2
+    4300006: LevelTerrain-BaseMesh
   materials:
     importMaterials: 1
     materialName: 0
