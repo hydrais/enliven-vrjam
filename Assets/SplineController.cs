@@ -132,7 +132,7 @@ public class SplineController : MonoBehaviour
 		if (mTransforms.Length > 0)
 		{
 			SetupSplineInterpolator(mSplineInterp, mTransforms);
-			mSplineInterp.StartInterpolation(null, true, WrapMode);
+			mSplineInterp.StartInterpolation(null, false, WrapMode);
 		}
 	}
 }
