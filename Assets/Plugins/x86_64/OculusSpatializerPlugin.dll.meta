@@ -24,7 +24,7 @@ PluginImporter:
     Linux:
       enabled: 0
       settings:
-        CPU: None
+        CPU: x86_64
     Linux64:
       enabled: 0
       settings:
@@ -36,11 +36,11 @@ PluginImporter:
     OSXIntel:
       enabled: 0
       settings:
-        CPU: None
+        CPU: x86_64
     OSXIntel64:
       enabled: 0
       settings:
-        CPU: AnyCPU
+        CPU: x86_64
     OSXUniversal:
       enabled: 0
       settings:
@@ -54,11 +54,11 @@ PluginImporter:
     Win:
       enabled: 1
       settings:
-        CPU: None
+        CPU: x86_64
     Win64:
       enabled: 0
       settings:
-        CPU: AnyCPU
+        CPU: x86_64
     WindowsStoreApps:
       enabled: 0
       settings:
@@ -73,4 +73,3 @@ PluginImporter:
         FrameworkDependencies: 
   userData: 
   assetBundleName: 
-  assetBundleVariant: 
