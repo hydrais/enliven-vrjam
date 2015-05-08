@@ -58,7 +58,7 @@ public class Enemy : MonoBehaviour {
 		var random = UnityEngine.Random.Range(0, 10);
 		if (attackingPlayer || random == 5) 
 		{
-			this.navMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+			/*this.navMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
 			attackingPlayer = true;
 			this.navMeshAgent.speed = 30;
 			this.animation.Play("run");
@@ -66,7 +66,7 @@ public class Enemy : MonoBehaviour {
 			audioSource.clip = Attack;
 			ospAudioSource.Play();
 
-			return;
+			return;*/
 		}
 		this.navMeshAgent.destination = destination;
 	}

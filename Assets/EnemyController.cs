@@ -23,18 +23,48 @@ public class EnemyController : MonoBehaviour
 
 	public List<Enemy> Enemies;
 
+	public bool doUpdate;
+
+	private TerrainData CanaryMountainTerrainData;
+
 	void Start () 
 	{
+		doUpdate = true;
+		CanaryMountainTerrainData = GameObject.FindGameObjectWithTag ("Terrain").GetComponent<TerrainCollider>().terrainData;
 		for (int i = 0; i < 5; i++) 
 		{
 			CreateEnemy ();
 		}
 
-		InvokeRepeating (
+		/*InvokeRepeating (
 			"ControllerLoop",
 			0,
 			5
-		);
+		);*/
+	}
+
+	void Update ()
+	{
+		if (doUpdate) {
+			foreach (var enemy in Enemies) {
+				var layerRoll = RollLayerDice ();
+				
+				if (layerRoll == LayerDiceRoll.Advance) {
+					AdvanceLayer (enemy);
+				} else if (layerRoll == LayerDiceRoll.Retreat) {
+					RetreatLayer (enemy);
+				}
+				
+				enemy.MoveTo (
+					GetRandomEnemyPosition (enemy.CurrentLayer)
+				);
+			}
+		}
+	}
+
+	void OnDisable()
+	{
+		doUpdate = false;
 	}
 
 	void ControllerLoop ()
@@ -60,8 +90,12 @@ public class EnemyController : MonoBehaviour
 
 	public void CreateEnemy ()
 	{
-		var instantiatedEnemy = GameObject.Instantiate (
-			Enemy
+		var instantiatedEnemy = (GameObject) GameObject.Instantiate (
+			Enemy,
+			GetRandomEnemyPosition (
+				Layer.Third
+			),
+			Enemy.transform.rotation
 		);
 
 		instantiatedEnemy.transform.position = GetRandomEnemyPosition (
@@ -153,13 +187,14 @@ public class EnemyController : MonoBehaviour
 
 	private Vector3 GetEnemyPosition (Vector3 playerPosition, int range, int angle)
 	{
+		var position = playerPosition;
+
 		var x = range * Mathf.Cos(angle * Mathf.Deg2Rad);
 		var z = range * Mathf.Sin(angle * Mathf.Deg2Rad);
 
-		var position = playerPosition;
-
 		position.x += x;
 		position.z += z;
+		position.y = CanaryMountainTerrainData.GetHeight ((int)position.x, (int)position.z)+2;
 
 		return position;
 	}
