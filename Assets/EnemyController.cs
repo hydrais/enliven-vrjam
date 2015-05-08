@@ -158,6 +158,11 @@ public class EnemyController : MonoBehaviour
             direction
         );
 
+		NavMeshHit hit;
+		if (NavMesh.SamplePosition(position, out hit, 10.0f, NavMesh.AllAreas)) {
+			position = hit.position;
+		}
+
 		return position;
     }
     
