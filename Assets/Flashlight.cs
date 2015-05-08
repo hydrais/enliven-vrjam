@@ -15,6 +15,7 @@ public class Flashlight : MonoBehaviour {
     {
         Light = GetComponent<Light>();
 		LightSwitch = GetComponent<OSPAudioSource> ();
+		Light.enabled = false;
     }
 	
 	void Update () {
