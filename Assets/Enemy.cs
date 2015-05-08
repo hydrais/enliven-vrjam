@@ -36,15 +36,7 @@ public class Enemy : MonoBehaviour {
 	{
 		if (attackingPlayer) 
 		{
-			var distance = Vector3.Distance(target.position, transform.position);
-			if (distance < 10f && !audioSource.isPlaying && !attackNoisePlayed)
-			{
-				audioSource.clip = Attack;
-				ospAudioSource.Play();
-				attackNoisePlayed = true;
-				//GetComponent<Animation>().Play("runBite");
-			}
-			//this.navMeshAgent.destination = target.position;
+			this.navMeshAgent.destination = target.position;
 		}
 		else if (!audioSource.isPlaying && RollAudioDice (out audioClip)) 
 		{
@@ -66,14 +58,28 @@ public class Enemy : MonoBehaviour {
 		var random = UnityEngine.Random.Range(0, 10);
 		if (attackingPlayer || random == 5) 
 		{
+			this.navMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
 			attackingPlayer = true;
 			this.navMeshAgent.speed = 30;
 			this.animation.Play("run");
 			this.navMeshAgent.destination = target.position;
+			audioSource.clip = Attack;
+			ospAudioSource.Play();
 
 			return;
 		}
 		this.navMeshAgent.destination = destination;
+	}
+
+	public void Kill()
+	{
+		this.navMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+		attackingPlayer = true;
+		this.navMeshAgent.speed = 30;
+		this.animation.Play("run");
+		this.navMeshAgent.destination = target.position;
+		audioSource.clip = Attack;
+		ospAudioSource.Play();
 	}
 	
 	private bool RollAudioDice (out AudioClip audioClip)

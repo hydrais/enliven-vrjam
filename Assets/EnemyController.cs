@@ -77,9 +77,10 @@ public class EnemyController : MonoBehaviour
 	{
 		if (enemy.CurrentLayer == Layer.Third)
 			enemy.CurrentLayer = Layer.Second;
-
-		if (enemy.CurrentLayer == Layer.Second)
+		else if (enemy.CurrentLayer == Layer.Second)
 			enemy.CurrentLayer = Layer.First;
+		else if (enemy.CurrentLayer == Layer.First)
+			enemy.Kill ();
 	}
 
 	public void RetreatLayer (Enemy enemy)
