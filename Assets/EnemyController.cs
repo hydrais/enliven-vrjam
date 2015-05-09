@@ -36,31 +36,20 @@ public class EnemyController : MonoBehaviour
 			CreateEnemy ();
 		}
 
-		/*InvokeRepeating (
+		InvokeRepeating (
 			"ControllerLoop",
 			0,
-			5
-		);*/
+			.2F
+		);
 	}
 
 	void Update ()
 	{
-		if (doUpdate) {
-			foreach (var enemy in Enemies) {
-				var layerRoll = RollLayerDice ();
-				
-				if (layerRoll == LayerDiceRoll.Advance) {
-					AdvanceLayer (enemy);
-				} else if (layerRoll == LayerDiceRoll.Retreat) {
-					RetreatLayer (enemy);
-				}
-				
-				enemy.MoveTo (
-					GetRandomEnemyPosition (enemy.CurrentLayer)
-				);
-			}
-		}
-	}
+        /*
+        if (doUpdate) {
+            ControllerLoop();
+        }*/
+    }
 
 	void OnDisable()
 	{
@@ -69,22 +58,26 @@ public class EnemyController : MonoBehaviour
 
 	void ControllerLoop ()
 	{
+        var attackThisTurn = false;
 		foreach (var enemy in Enemies)
 		{
 			var layerRoll = RollLayerDice ();
 
 			if (layerRoll == LayerDiceRoll.Advance)
 			{
-				AdvanceLayer(enemy);
+                attackThisTurn = AdvanceLayer(enemy);
 			}
 			else if (layerRoll == LayerDiceRoll.Retreat)
 			{
 				RetreatLayer(enemy);
 			}
 
-			enemy.MoveTo (
-				GetRandomEnemyPosition (enemy.CurrentLayer)
-			);
+            if (enemy.PathComplete())
+            {
+                enemy.MoveTo(
+                    GetRandomEnemyPosition(enemy.CurrentLayer)
+                );
+            }
 		}
 	}
 
@@ -98,23 +91,23 @@ public class EnemyController : MonoBehaviour
 			Enemy.transform.rotation
 		);
 
-		instantiatedEnemy.transform.position = GetRandomEnemyPosition (
-			Layer.Third
-		);
-
 		this.Enemies.Add (
 			instantiatedEnemy.GetComponent<Enemy> ()
 		);
 	}
 
-	public void AdvanceLayer (Enemy enemy)
+	public bool AdvanceLayer (Enemy enemy)
 	{
 		if (enemy.CurrentLayer == Layer.Third)
 			enemy.CurrentLayer = Layer.Second;
 		else if (enemy.CurrentLayer == Layer.Second)
 			enemy.CurrentLayer = Layer.First;
-		else if (enemy.CurrentLayer == Layer.First)
-			enemy.Kill ();
+        else if (enemy.CurrentLayer == Layer.First)
+        {
+            enemy.Kill();
+            return true;
+        }
+        return false;
 	}
 
 	public void RetreatLayer (Enemy enemy)
@@ -173,18 +166,18 @@ public class EnemyController : MonoBehaviour
 
 		if (layer == Layer.First) 
 		{
-			min = 10;
-			max = 15;
-		} 
-		else if (layer == Layer.Second) 
-		{
 			min = 15;
 			max = 35;
 		} 
-		else if (layer == Layer.Third) 
+		else if (layer == Layer.Second) 
 		{
 			min = 35;
 			max = 55;
+		} 
+		else if (layer == Layer.Third) 
+		{
+			min = 55;
+			max = 75;
 		}
 
 		return UnityEngine.Random.Range (min, max);

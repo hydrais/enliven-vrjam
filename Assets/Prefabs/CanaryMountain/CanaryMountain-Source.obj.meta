@@ -1,0 +1,87 @@
+fileFormatVersion: 2
+guid: dda053d20ec9f7c4987074823527ca1b
+timeCreated: 1431137982
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: CanaryMountain-BaseMesh
+    100002: CanaryMountain-BaseMesh_MeshPart0
+    100004: CanaryMountain-BaseMesh_MeshPart1
+    100006: CanaryMountain-BaseMesh_MeshPart2
+    100008: //RootNode
+    400000: CanaryMountain-BaseMesh
+    400002: CanaryMountain-BaseMesh_MeshPart0
+    400004: CanaryMountain-BaseMesh_MeshPart1
+    400006: CanaryMountain-BaseMesh_MeshPart2
+    400008: //RootNode
+    2300000: CanaryMountain-BaseMesh_MeshPart0
+    2300002: CanaryMountain-BaseMesh_MeshPart1
+    2300004: CanaryMountain-BaseMesh_MeshPart2
+    2300006: CanaryMountain-BaseMesh
+    3300000: CanaryMountain-BaseMesh_MeshPart0
+    3300002: CanaryMountain-BaseMesh_MeshPart1
+    3300004: CanaryMountain-BaseMesh_MeshPart2
+    3300006: CanaryMountain-BaseMesh
+    4300000: CanaryMountain-BaseMesh_MeshPart0
+    4300002: CanaryMountain-BaseMesh_MeshPart1
+    4300004: CanaryMountain-BaseMesh_MeshPart2
+    4300006: CanaryMountain-BaseMesh
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 0
+    splitTangentsAcrossUV: 1
+    normalImportMode: 1
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

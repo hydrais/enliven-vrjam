@@ -10,23 +10,53 @@ ModelImporter:
     100004: CanaryMountain-BaseMesh_MeshPart0
     100006: CanaryMountain-BaseMesh_MeshPart1
     100008: CanaryMountain-BaseMesh_MeshPart2
+    100010: CanaryMountain-BaseMesh_MeshPart3
+    100012: CanaryMountain-BaseMesh_MeshPart4
+    100014: CanaryMountain-BaseMesh_MeshPart5
+    100016: CanaryMountain-BaseMesh_MeshPart6
+    100018: CanaryMountain-BaseMesh_MeshPart7
+    100020: CanaryMountain-BaseMesh_MeshPart8
     400000: CanaryMountain-BaseMesh
     400002: //RootNode
     400004: CanaryMountain-BaseMesh_MeshPart0
     400006: CanaryMountain-BaseMesh_MeshPart1
     400008: CanaryMountain-BaseMesh_MeshPart2
+    400010: CanaryMountain-BaseMesh_MeshPart3
+    400012: CanaryMountain-BaseMesh_MeshPart4
+    400014: CanaryMountain-BaseMesh_MeshPart5
+    400016: CanaryMountain-BaseMesh_MeshPart6
+    400018: CanaryMountain-BaseMesh_MeshPart7
+    400020: CanaryMountain-BaseMesh_MeshPart8
     2300000: CanaryMountain-BaseMesh
     2300002: CanaryMountain-BaseMesh_MeshPart0
     2300004: CanaryMountain-BaseMesh_MeshPart1
     2300006: CanaryMountain-BaseMesh_MeshPart2
+    2300008: CanaryMountain-BaseMesh_MeshPart3
+    2300010: CanaryMountain-BaseMesh_MeshPart4
+    2300012: CanaryMountain-BaseMesh_MeshPart5
+    2300014: CanaryMountain-BaseMesh_MeshPart6
+    2300016: CanaryMountain-BaseMesh_MeshPart7
+    2300018: CanaryMountain-BaseMesh_MeshPart8
     3300000: CanaryMountain-BaseMesh
     3300002: CanaryMountain-BaseMesh_MeshPart0
     3300004: CanaryMountain-BaseMesh_MeshPart1
     3300006: CanaryMountain-BaseMesh_MeshPart2
+    3300008: CanaryMountain-BaseMesh_MeshPart3
+    3300010: CanaryMountain-BaseMesh_MeshPart4
+    3300012: CanaryMountain-BaseMesh_MeshPart5
+    3300014: CanaryMountain-BaseMesh_MeshPart6
+    3300016: CanaryMountain-BaseMesh_MeshPart7
+    3300018: CanaryMountain-BaseMesh_MeshPart8
     4300000: CanaryMountain-BaseMesh
     4300002: CanaryMountain-BaseMesh_MeshPart0
     4300004: CanaryMountain-BaseMesh_MeshPart1
     4300006: CanaryMountain-BaseMesh_MeshPart2
+    4300008: CanaryMountain-BaseMesh_MeshPart3
+    4300010: CanaryMountain-BaseMesh_MeshPart4
+    4300012: CanaryMountain-BaseMesh_MeshPart5
+    4300014: CanaryMountain-BaseMesh_MeshPart6
+    4300016: CanaryMountain-BaseMesh_MeshPart7
+    4300018: CanaryMountain-BaseMesh_MeshPart8
   materials:
     importMaterials: 1
     materialName: 0
