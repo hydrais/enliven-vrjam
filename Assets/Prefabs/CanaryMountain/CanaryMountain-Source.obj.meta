@@ -1,32 +1,17 @@
 fileFormatVersion: 2
 guid: dda053d20ec9f7c4987074823527ca1b
-timeCreated: 1431137982
+timeCreated: 1431201973
 licenseType: Pro
 ModelImporter:
   serializedVersion: 18
   fileIDToRecycleName:
     100000: CanaryMountain-BaseMesh
-    100002: CanaryMountain-BaseMesh_MeshPart0
-    100004: CanaryMountain-BaseMesh_MeshPart1
-    100006: CanaryMountain-BaseMesh_MeshPart2
-    100008: //RootNode
+    100002: //RootNode
     400000: CanaryMountain-BaseMesh
-    400002: CanaryMountain-BaseMesh_MeshPart0
-    400004: CanaryMountain-BaseMesh_MeshPart1
-    400006: CanaryMountain-BaseMesh_MeshPart2
-    400008: //RootNode
-    2300000: CanaryMountain-BaseMesh_MeshPart0
-    2300002: CanaryMountain-BaseMesh_MeshPart1
-    2300004: CanaryMountain-BaseMesh_MeshPart2
-    2300006: CanaryMountain-BaseMesh
-    3300000: CanaryMountain-BaseMesh_MeshPart0
-    3300002: CanaryMountain-BaseMesh_MeshPart1
-    3300004: CanaryMountain-BaseMesh_MeshPart2
-    3300006: CanaryMountain-BaseMesh
-    4300000: CanaryMountain-BaseMesh_MeshPart0
-    4300002: CanaryMountain-BaseMesh_MeshPart1
-    4300004: CanaryMountain-BaseMesh_MeshPart2
-    4300006: CanaryMountain-BaseMesh
+    400002: //RootNode
+    2300000: CanaryMountain-BaseMesh
+    3300000: CanaryMountain-BaseMesh
+    4300000: CanaryMountain-BaseMesh
   materials:
     importMaterials: 1
     materialName: 0
