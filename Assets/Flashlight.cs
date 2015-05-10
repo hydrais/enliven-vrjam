@@ -31,7 +31,7 @@ public class Flashlight : MonoBehaviour {
         }
         if (Input.GetButton("Mouse 1"))
         {
-            Application.LoadLevel(0);
+            RestartLevel();
         }
         if (Light.enabled)
         {
@@ -45,6 +45,11 @@ public class Flashlight : MonoBehaviour {
             }
         }
 	}
+
+    public static void RestartLevel()
+    {
+        Application.LoadLevel(0);
+    }
 	
 	private void handleHit (GameObject gameObject) {
 		if (gameObject.tag == EnemyTag) {
