@@ -37,6 +37,7 @@ public class HomeMenu : MonoBehaviour
 	public AudioClip			menuHideSound = null;
 	public AudioClip			menuHighlightSound = null;
 	public AudioClip			menuClickSound = null;
+    public bool                 openMenuWithInput = true;
 
 	private AudioSource			audioEmitter = null;
 	private Renderer[]			renderers = new Renderer[0];
@@ -94,6 +95,10 @@ public class HomeMenu : MonoBehaviour
 	/// </summary>
 	float Show(bool show, bool immediate = false)
 	{
+        if (!openMenuWithInput)
+        {
+            return 0.0f;
+        }
 		if ((show && isVisible) || (!show && !isVisible))
 		{
 			if (show)
@@ -140,6 +145,58 @@ public class HomeMenu : MonoBehaviour
 
 		return delaySecs;
 	}
+
+    /// <summary>
+    /// Shows and hides the menu
+    /// </summary>
+    public float ShowMenu(bool show, bool immediate = false)
+    {
+        if ((show && isVisible) || (!show && !isVisible))
+        {
+            if (show)
+            {
+                // refresh any children
+                BroadcastMessage("OnRefresh", SendMessageOptions.DontRequireReceiver);
+            }
+            return 0.0f;
+        }
+        float delaySecs = 0.0f;
+        if (show)
+        {
+            // orient and position in front of the player's view
+            Vector3 offset = (cameraController.centerEyeAnchor.forward * distanceFromViewer);
+            offset.y = (transform.position.y - cameraController.centerEyeAnchor.position.y);
+            transform.position = cameraController.centerEyeAnchor.position + offset;
+            Vector3 dirToCamera = (cameraController.centerEyeAnchor.position - transform.position);
+            dirToCamera.y = 0.0f;
+            transform.forward = dirToCamera.normalized;
+
+            // refresh any children
+            BroadcastMessage("OnRefresh", SendMessageOptions.DontRequireReceiver);
+            // show the menu elements and play the animation
+            ShowRenderers(true);
+            delaySecs = PlayAnim((immediate) ? menuIdleAnim : menuShowAnim);
+        }
+        else
+        {
+            // hide the menu after the hide anim finishes
+            delaySecs = (immediate) ? 0.0f : PlayAnim(menuHideAnim);
+        }
+        if (!immediate)
+        {
+            PlaySound(show ? menuShowSound : menuHideSound);
+        }
+        isVisible = show;
+        // reset the menu state
+        activeButton = null;
+        //homeButtonPressed = false;
+        homeButtonDownTime = 0.0f;
+        // don't allow Show/Hide until this anim is done
+        isShowingOrHiding = true;
+        Invoke("OnMenuAnimFinished", delaySecs);
+
+        return delaySecs;
+    }
 
 	/// <summary>
 	/// Called when the show or hide anim is finished

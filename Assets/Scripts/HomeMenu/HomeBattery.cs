@@ -48,18 +48,31 @@ public class HomeBattery : MonoBehaviour
 		}
 	}
 
+    void Update()
+    {
+        Vector3 scale = juiceLevel.localScale;
+        scale.x = Flashlight.batteryLevel;
+        juiceLevel.localScale = scale;
+
+        float colorScale;
+        if (Flashlight.FlashlightOn)
+        {
+            colorScale = 0f;
+        }
+        else
+        {
+            colorScale = 1f;
+        }
+        Color juiceColor = batteryTempGradient.Evaluate(colorScale);
+        batteryMaterial.color = juiceColor;
+    }
+
 	/// <summary>
 	/// Message handler that is called before the menu is redisplayed
 	/// </summary>
 	void OnRefresh()
 	{
-		Debug.Log("> Device Battery Level: " + OVRManager.batteryLevel);
-		Vector3 scale = juiceLevel.localScale;
-		scale.x = OVRManager.batteryLevel;
-		juiceLevel.localScale = scale;
 
-		Debug.Log("> Battery Temp: " + OVRManager.batteryTemperature + "C");
-		// 30 degrees C == green/cool, 45 degrees C == red/hot
 		float colorScale = Mathf.InverseLerp(30.0f, 45.0f, OVRManager.batteryTemperature);
 		Color juiceColor = batteryTempGradient.Evaluate(colorScale);
 		batteryMaterial.color = juiceColor;
