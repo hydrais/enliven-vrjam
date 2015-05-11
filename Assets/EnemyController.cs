@@ -43,42 +43,41 @@ public class EnemyController : MonoBehaviour
 		);
 	}
 
-	void Update ()
-	{
-        /*
-        if (doUpdate) {
-            ControllerLoop();
-        }*/
-    }
-
-	void OnDisable()
+	public void GameOver()
 	{
 		doUpdate = false;
+        foreach (var enemy in Enemies)
+        {
+            enemy.GameOver();
+        }
 	}
 
 	void ControllerLoop ()
 	{
-        var attackThisTurn = false;
-		foreach (var enemy in Enemies)
-		{
-			var layerRoll = RollLayerDice ();
-
-			if (layerRoll == LayerDiceRoll.Advance)
-			{
-                attackThisTurn = AdvanceLayer(enemy);
-			}
-			else if (layerRoll == LayerDiceRoll.Retreat)
-			{
-				RetreatLayer(enemy);
-			}
-
-            if (enemy.PathComplete())
+        if (doUpdate)
+        {
+            var attackThisTurn = false;
+            foreach (var enemy in Enemies)
             {
-                enemy.MoveTo(
-                    GetRandomEnemyPosition(enemy.CurrentLayer)
-                );
+                var layerRoll = RollLayerDice();
+
+                if (layerRoll == LayerDiceRoll.Advance)
+                {
+                    attackThisTurn = AdvanceLayer(enemy);
+                }
+                else if (layerRoll == LayerDiceRoll.Retreat)
+                {
+                    RetreatLayer(enemy);
+                }
+
+                if (enemy.PathComplete())
+                {
+                    enemy.MoveTo(
+                        GetRandomEnemyPosition(enemy.CurrentLayer)
+                    );
+                }
             }
-		}
+        }
 	}
 
 	public void CreateEnemy ()
@@ -91,10 +90,17 @@ public class EnemyController : MonoBehaviour
 			Enemy.transform.rotation
 		);
 
-		this.Enemies.Add (
-			instantiatedEnemy.GetComponent<Enemy> ()
-		);
+        var enemy = instantiatedEnemy.GetComponent<Enemy>();
+		this.Enemies.Add(enemy);
+        enemy.Vanquished += enemy_Vanquished;
 	}
+
+    void enemy_Vanquished(object sender, EventArgs e)
+    {
+        var enemy = (Enemy)sender;
+        Enemies.Remove(enemy);
+        CreateEnemy();
+    }
 
 	public bool AdvanceLayer (Enemy enemy)
 	{
@@ -152,7 +158,7 @@ public class EnemyController : MonoBehaviour
         );
 
 		NavMeshHit hit;
-		if (NavMesh.SamplePosition(position, out hit, 10.0f, NavMesh.AllAreas)) {
+		if (NavMesh.SamplePosition(position, out hit, 3f, 1)) {
 			position = hit.position;
 		}
 
@@ -192,7 +198,6 @@ public class EnemyController : MonoBehaviour
 
 		position.x += x;
 		position.z += z;
-		position.y = CanaryMountainTerrainData.GetHeight ((int)position.x, (int)position.z)+2;
 
 		return position;
 	}

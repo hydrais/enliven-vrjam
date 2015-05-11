@@ -98,7 +98,6 @@ public class Flashlight : MonoBehaviour {
 	
 	private void handleHit (GameObject gameObject) {
 		if (gameObject.tag == EnemyTag) {
-            homeMenu.ShowMenu(true);
 			gameObject.GetComponent<Enemy>().Vanquish();
 		}
 	}

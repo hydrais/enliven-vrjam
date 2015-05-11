@@ -73,8 +73,8 @@ public class HomeBattery : MonoBehaviour
 	void OnRefresh()
 	{
 
-		float colorScale = Mathf.InverseLerp(30.0f, 45.0f, OVRManager.batteryTemperature);
+		/*float colorScale = Mathf.InverseLerp(30.0f, 45.0f, OVRManager.batteryTemperature);
 		Color juiceColor = batteryTempGradient.Evaluate(colorScale);
-		batteryMaterial.color = juiceColor;
+		batteryMaterial.color = juiceColor;*/
 	}
 }

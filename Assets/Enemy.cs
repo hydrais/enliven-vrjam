@@ -9,9 +9,13 @@ public class Enemy : MonoBehaviour {
 
 	public AudioClip Howl;
 	public AudioClip Yelp;
-	public AudioClip Growl;
+	public AudioClip Eat;
 	public AudioClip Attack;
 	public float attackSpeed;
+    public SkinnedMeshRenderer WolfMesh;
+    public GameObject Eyes;
+    public bool dead = false;
+    public EnemyController enemyController;
 
 	private Animation animation;
 	private NavMeshAgent navMeshAgent;
@@ -20,8 +24,8 @@ public class Enemy : MonoBehaviour {
 	private AudioClip audioClip;
 	private bool attackingPlayer = false;
 	private Transform target;
-	private bool dead = false;
 	private bool attackNoisePlayed = false;
+    private bool eatingPlayer = false;
 	
 	void Start ()
 	{
@@ -44,11 +48,16 @@ public class Enemy : MonoBehaviour {
                 ospAudioSource.Priority = 10;
             }
 		}
-		else if (!audioSource.isPlaying && RollAudioDice (out audioClip)) 
+		else if (!audioSource.isPlaying && RollAudioDice (out audioClip) && !dead) 
 		{
 			audioSource.clip = audioClip;
 			ospAudioSource.Play();
 		}
+        else if (dead && eatingPlayer && !audioSource.isPlaying)
+        {
+            audioSource.clip = Eat;
+            ospAudioSource.Play();
+        }
 	}
 
 	public void Vanquish ()
@@ -62,8 +71,26 @@ public class Enemy : MonoBehaviour {
             this.ospAudioSource.Play();
             dead = true;
             this.navMeshAgent.Stop();
+            if (Vanquished != null)
+            {
+                Vanquished(this, null);
+            }
         }
 	}
+
+    public void GameOver()
+    {
+        dead = true;
+        this.navMeshAgent.Stop();
+        WolfMesh.enabled = false;
+        Eyes.SetActive(false);
+    }
+
+    public void EatPlayer()
+    {
+        eatingPlayer = true;
+        audioSource.volume = .2f;
+    }
 	
 	public void MoveTo (Vector3 destination)
 	{

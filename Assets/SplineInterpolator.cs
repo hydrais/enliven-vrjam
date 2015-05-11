@@ -188,6 +188,11 @@ public class SplineInterpolator : MonoBehaviour
 		}
 	}
 
+    public void Stop()
+    {
+        mState = "Stopped";
+    }
+
 	Quaternion GetSquad(int idxFirstPoint, float t)
 	{
 		Quaternion Q0 = mNodes[idxFirstPoint - 1].Rot;
