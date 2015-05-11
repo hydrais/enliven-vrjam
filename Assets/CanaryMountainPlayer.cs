@@ -25,6 +25,14 @@ public class CanaryMountainPlayer : MonoBehaviour {
         }
     }
 
+    public static void StartGame()
+    {
+        EnemyController.doUpdate = true;
+        Flashlight.doUpdate = true;
+        var splineController = GameObject.FindGameObjectWithTag("Cart").GetComponent<SplineController>();
+        splineController.FollowSpline();
+    }
+
     void OnTriggerEnter(Collider collider)
     {
         if (!sceneEnded && !sceneEnding && collider.gameObject.tag == "Enemy")
@@ -36,6 +44,7 @@ public class CanaryMountainPlayer : MonoBehaviour {
                 splineInterpolator.Stop();
                 sceneEnding = true;
                 enemyController.GameOver();
+                Flashlight.doUpdate = false;
                 enemy.EatPlayer();
             }
             
@@ -50,6 +59,7 @@ public class CanaryMountainPlayer : MonoBehaviour {
             sceneEnding = false;
             sceneEnded = true;
             homeMenu.ShowMenu(true);
+            
         //}
     }
 }

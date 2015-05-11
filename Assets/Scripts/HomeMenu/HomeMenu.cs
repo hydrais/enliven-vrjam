@@ -18,7 +18,8 @@ public enum HomeCommand
 	None = -1,
 	NewGame = 0,
 	Continue = 1,
-	Quit = 2,		// return to the Oculus home/dashboard app
+	Quit = 2,
+    Start = 3,// return to the Oculus home/dashboard app
 }
 
 public class HomeMenu : MonoBehaviour
@@ -38,6 +39,7 @@ public class HomeMenu : MonoBehaviour
 	public AudioClip			menuHighlightSound = null;
 	public AudioClip			menuClickSound = null;
     public bool                 openMenuWithInput = true;
+    public bool                 showOnStart = false;
 
 	private AudioSource			audioEmitter = null;
 	private Renderer[]			renderers = new Renderer[0];
@@ -87,8 +89,16 @@ public class HomeMenu : MonoBehaviour
 		animator[ menuShowAnim ].layer = 2;
 		animator[ menuHideAnim ].layer = 2;
 		// hide the menu to start
-		ShowRenderers( false );
+        ShowRenderers(false);
 	}
+
+    void Start()
+    {
+        if (showOnStart)
+        {
+            ShowMenu(true);
+        }
+    }
 
 	/// <summary>
 	/// Shows and hides the menu
@@ -382,6 +392,10 @@ public class HomeMenu : MonoBehaviour
 		case HomeCommand.NewGame:
             Application.LoadLevel(0);
 			break;
+        case HomeCommand.Start:
+            CanaryMountainPlayer.StartGame();
+            ShowMenu(false, immediate);
+            break;
 		case HomeCommand.Continue:
 			// TODO
 			break;

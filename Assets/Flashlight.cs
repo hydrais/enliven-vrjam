@@ -15,6 +15,7 @@ public class Flashlight : MonoBehaviour {
 	private OSPAudioSource LightSwitch;
     public static float batteryLevel = 1.0f;
     public static bool FlashlightOn = true;
+    public static bool doUpdate = false;
 
     void Start()
     {
@@ -25,40 +26,42 @@ public class Flashlight : MonoBehaviour {
     }
 	
 	void Update () {
-
-        if (!FlashlightOn)
+        if (doUpdate)
         {
-            rechargeBattery();
-            return;
-        }
-        if (Input.GetButtonDown("Mouse 0"))
-        {
-            Light.enabled = true;
-			LightSwitch.Play();
-        }
-        if (Input.GetButtonUp("Mouse 0"))
-        {
-            Light.enabled = false;
-        }
-        if (Input.GetButton("Mouse 1"))
-        {
-            RestartLevel();
-        }
-        if (Light.enabled)
-        {
-            fadeBattery();
-            Vector3 forward = transform.TransformDirection(Vector3.forward);
-            if (Physics.Raycast(this.transform.position, forward, out hit, Distance))
+            if (!FlashlightOn)
             {
-                if (hit.transform && hit.transform.gameObject)
+                rechargeBattery();
+                return;
+            }
+            if (Input.GetButtonDown("Mouse 0"))
+            {
+                Light.enabled = true;
+                LightSwitch.Play();
+            }
+            if (Input.GetButtonUp("Mouse 0"))
+            {
+                Light.enabled = false;
+            }
+            if (Input.GetButton("Mouse 1"))
+            {
+                RestartLevel();
+            }
+            if (Light.enabled)
+            {
+                fadeBattery();
+                Vector3 forward = transform.TransformDirection(Vector3.forward);
+                if (Physics.Raycast(this.transform.position, forward, out hit, Distance))
                 {
-                    this.handleHit(hit.transform.gameObject);
+                    if (hit.transform && hit.transform.gameObject)
+                    {
+                        this.handleHit(hit.transform.gameObject);
+                    }
                 }
             }
-        }
-        else
-        {
-            rechargeBattery();
+            else
+            {
+                rechargeBattery();
+            }
         }
 	}
 

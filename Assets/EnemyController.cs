@@ -23,13 +23,13 @@ public class EnemyController : MonoBehaviour
 
 	public List<Enemy> Enemies;
 
-	public bool doUpdate;
+	public static bool doUpdate;
 
 	private TerrainData CanaryMountainTerrainData;
 
 	void Start () 
 	{
-		doUpdate = true;
+		doUpdate = false;
 		CanaryMountainTerrainData = GameObject.FindGameObjectWithTag ("Terrain").GetComponent<TerrainCollider>().terrainData;
 		for (int i = 0; i < 5; i++) 
 		{

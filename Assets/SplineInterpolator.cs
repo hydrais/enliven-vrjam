@@ -22,7 +22,7 @@ public class SplineInterpolator : MonoBehaviour
 	}
 
 	List<SplineNode> mNodes = new List<SplineNode>();
-	string mState = "";
+	public static string mState = "";
 	bool mRotations;
 
 	OnEndCallback mOnEndCallback;
