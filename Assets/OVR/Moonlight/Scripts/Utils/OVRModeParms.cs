@@ -1,15 +1,15 @@
-﻿/************************************************************************************
+/************************************************************************************
 
 Copyright   :   Copyright 2014 Oculus VR, LLC. All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License");
+Licensed under the Oculus VR Rift SDK License Version 3.3 (the "License");
 you may not use the Oculus VR Rift SDK except in compliance with the License,
 which is provided at the time of installation or download, or which
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.2
+http://www.oculus.com/licenses/LICENSE-3.3
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,68 +20,36 @@ limitations under the License.
 ************************************************************************************/
 
 using UnityEngine;
-using System.Runtime.InteropServices; // required for DllImport
+using VR = UnityEngine.VR;
 
+/// <summary>
+/// Logs when the application enters power save mode and allows you to a low-power CPU/GPU level with a button press.
+/// </summary>
 public class OVRModeParms : MonoBehaviour
 {
-#if (UNITY_ANDROID && !UNITY_EDITOR)
-	[DllImport("OculusPlugin")]
-	// Set the fixed CPU clock level.
-	private static extern void OVR_VrModeParms_SetCpuLevel(int cpuLevel);
-
-	[DllImport("OculusPlugin")]
-	// Set the fixed GPU clock level.
-	private static extern void OVR_VrModeParms_SetGpuLevel(int gpuLevel);
-
-	[DllImport("OculusPlugin")]
-	// If true, when the application detects it has been throttled, the Platform
-	// UI will display a dismissable warning, then returns to the app in powersave
-	// mode at 30FPS.
-	// If false, the Platform UI will display a non-dismissable error message
-	// indicating the user must leave VR.
-	// Set to false if the application continues to judder even when forced to
-	// 30FPS in power save mode.
-	private static extern void OVR_VrModeParms_SetAllowPowerSave(bool allow);
-
-	[DllImport("OculusPlugin")]
-	// Returns true if the application has been throttled.
-	private static extern bool OVR_IsPowerSaveActive();
-
-	[DllImport("OculusPlugin")]
-	// Support to fix 60/30/20 FPS frame rate for consistency or power savings.
-	private static extern void OVR_TW_SetMinimumVsyncs(OVRTimeWarpUtils.VsyncMode mode);
-#endif
-
 #region Member Variables
 
-	public OVRGamepadController.Button	resetButton = OVRGamepadController.Button.X;
+	/// <summary>
+	/// The gamepad button that will switch the application to CPU level 0 and GPU level 1.
+	/// </summary>
+	public OVRInput.RawButton	resetButton = OVRInput.RawButton.X;	
 
 #endregion
 
 	/// <summary>
-	/// Enable vr mode parm configuration and invoke power state mode test.
+	/// Invoke power state mode test.
 	/// </summary>
-	void OnEnable()
-	{
-#if (UNITY_ANDROID && !UNITY_EDITOR)
-		OVRManager.OnConfigureVrModeParms += ConfigureVrModeParms;
-		
+	void Start()
+	{		
+		if (!OVRManager.isHmdPresent)
+		{
+			enabled = false;
+			return;
+		}
+
 		// Call TestPowerLevelState after 10 seconds 
 		// and repeats every 10 seconds.
-		InvokeRepeating ("TestPowerStateMode", 10, 10.0f);
-#endif
-	}
-
-	/// <summary>
-	/// Disable vr mode parm configuration and un-invoke power state mode test.
-	/// </summary>
-	void OnDisable()
-	{
-#if (UNITY_ANDROID && !UNITY_EDITOR)
-		OVRManager.OnConfigureVrModeParms -= ConfigureVrModeParms;
-
-		CancelInvoke();
-#endif
+		InvokeRepeating ( "TestPowerStateMode", 10, 10.0f );
 	}
 
 	/// <summary>
@@ -89,14 +57,16 @@ public class OVRModeParms : MonoBehaviour
 	/// </summary>
 	void Update()
 	{
-		// NOTE: some of the buttons defined in OVRGamepadController.Button are not available on the Android game pad controller
-		if ( Input.GetButtonDown(OVRGamepadController.ButtonNames[(int)resetButton])) 
+		// NOTE: some of the buttons defined in OVRInput.RawButton are not available on the Android game pad controller
+		if ( OVRInput.GetDown(resetButton)) 
 		{
-#if (UNITY_ANDROID && !UNITY_EDITOR)
-			OVR_VrModeParms_SetCpuLevel(0);
-			OVR_VrModeParms_SetGpuLevel(1);
-			OVRPluginEvent.Issue(RenderEventType.ResetVrModeParms);
-#endif
+			//*************************
+			// Dynamically change VrModeParms cpu and gpu level.
+			// NOTE: Reset will cause 1 frame of flicker as it leaves
+			// and re-enters Vr mode.
+			//*************************
+			OVRPlugin.cpuLevel = 0;
+			OVRPlugin.gpuLevel = 1;
 		}
 	}
 
@@ -105,38 +75,13 @@ public class OVRModeParms : MonoBehaviour
 	/// </summary>
 	void TestPowerStateMode()
 	{
-#if (UNITY_ANDROID && !UNITY_EDITOR)
 		//*************************
 		// Check power-level state mode
 		//*************************
-		if (OVR_IsPowerSaveActive())
+		if (OVRPlugin.powerSaving)
 		{
 			// The device has been throttled
 			Debug.Log("POWER SAVE MODE ACTIVATED");
 		}
-#endif
-	}
-
-	/// <summary>
-	/// Configure vr mode parms.
-	/// </summary>
-	void ConfigureVrModeParms()
-	{
-#if (UNITY_ANDROID && !UNITY_EDITOR)
-		// De-clock to reduce power and thermal load.
-		
-		// Performance mode (default)
-		OVR_VrModeParms_SetCpuLevel(2);
-		OVR_VrModeParms_SetGpuLevel(2);
-		OVR_TW_SetMinimumVsyncs(OVRTimeWarpUtils.VsyncMode.VSYNC_60FPS);
-		
-		// Power-save levels
-		//OVR_VrModeParms_SetCpuLevel(0);
-		//OVR_VrModeParms_SetGpuLevel(0);
-		//OVR_TW_SetMinimumVsyncs(OVRTimeWarpUtils.VsyncMode.VSYNC_30FPS);
-		
-		// Enable Power Save Mode Handling
-		OVR_VrModeParms_SetAllowPowerSave(true);
-#endif
 	}
 }

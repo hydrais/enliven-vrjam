@@ -399,7 +399,7 @@ public class QT_CombineMeshes : EditorWindow
         }
         PrefabUtility.CreatePrefab(targetFolder + "/" + newParent.name + ".prefab", newParent);
         
-        GameObject prefab_go = PrefabUtility.InstantiatePrefab(Resources.LoadAssetAtPath(targetFolder + "/" + newParent.name + ".prefab", typeof(GameObject))) as GameObject;
+        GameObject prefab_go = PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath(targetFolder + "/" + newParent.name + ".prefab", typeof(GameObject))) as GameObject;
         prefab_go.transform.position = newParent.transform.position;
         GameObject.DestroyImmediate(newParent);
     }
@@ -465,7 +465,7 @@ public class QT_CombineMeshes : EditorWindow
             //delete old to replace with prefab
             DestroyImmediate(selectionmeshes[i]);
 
-            GameObject prefab_go = PrefabUtility.InstantiatePrefab(Resources.LoadAssetAtPath(targetFolder+"/" + name + ".prefab", typeof(GameObject))) as GameObject;
+            GameObject prefab_go = PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath(targetFolder+"/" + name + ".prefab", typeof(GameObject))) as GameObject;
             //ensure prefab replacement in scene
             prefab_go.transform.parent = parent_tr;
             prefab_go.transform.position = child_pos;

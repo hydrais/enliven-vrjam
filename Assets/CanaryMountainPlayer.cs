@@ -12,7 +12,7 @@ public class CanaryMountainPlayer : MonoBehaviour {
     private bool sceneEnded = false;
 
 	void Start () {
-        homeMenu = GameObject.FindGameObjectWithTag("DeathMenu").GetComponent<HomeMenu>();
+        StartGame();
         enemyController = GameObject.FindGameObjectWithTag("EnemyController").GetComponent<EnemyController>();
         splineInterpolator = GetComponent<SplineInterpolator>();
 	}
@@ -58,7 +58,6 @@ public class CanaryMountainPlayer : MonoBehaviour {
         //{
             sceneEnding = false;
             sceneEnded = true;
-            homeMenu.ShowMenu(true);
             
         //}
     }

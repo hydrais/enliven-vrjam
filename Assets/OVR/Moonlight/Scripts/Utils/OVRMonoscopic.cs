@@ -1,15 +1,15 @@
-﻿/************************************************************************************
+/************************************************************************************
 
 Copyright   :   Copyright 2014 Oculus VR, LLC. All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License");
+Licensed under the Oculus VR Rift SDK License Version 3.3 (the "License");
 you may not use the Oculus VR Rift SDK except in compliance with the License,
 which is provided at the time of installation or download, or which
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.2
+http://www.oculus.com/licenses/LICENSE-3.3
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,9 +21,16 @@ limitations under the License.
 
 using UnityEngine;
 
-public class OVRMonoscopic : MonoBehaviour {
-	
-	public OVRGamepadController.Button	toggleButton = OVRGamepadController.Button.B;
+/// <summary>
+/// Allows you to toggle monoscopic rendering with a gamepad button press.
+/// </summary>
+public class OVRMonoscopic : MonoBehaviour
+{
+	/// <summary>
+	/// The gamepad button that will toggle monoscopic rendering.
+	/// </summary>
+	public OVRInput.RawButton	toggleButton = OVRInput.RawButton.B;
+
 	private bool						monoscopic = false;
 
 	/// <summary>
@@ -32,8 +39,8 @@ public class OVRMonoscopic : MonoBehaviour {
 	/// </summary>
 	void Update()
 	{
-		// NOTE: some of the buttons defined in OVRGamepadController.Button are not available on the Android game pad controller
-		if (Input.GetButtonDown(OVRGamepadController.ButtonNames[(int)toggleButton]))
+		// NOTE: some of the buttons defined in OVRInput.RawButton are not available on the Android game pad controller
+		if (OVRInput.GetDown(toggleButton))
 		{
 			//*************************
 			// toggle monoscopic rendering mode

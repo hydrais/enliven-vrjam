@@ -1,15 +1,15 @@
-﻿/************************************************************************************
+/************************************************************************************
 
 Copyright   :   Copyright 2014 Oculus VR, LLC. All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License");
+Licensed under the Oculus VR Rift SDK License Version 3.3 (the "License");
 you may not use the Oculus VR Rift SDK except in compliance with the License,
 which is provided at the time of installation or download, or which
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.2
+http://www.oculus.com/licenses/LICENSE-3.3
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,13 +37,9 @@ public class OVRScreenFade : MonoBehaviour
 	/// </summary>
 	public Color fadeColor = new Color(0.01f, 0.01f, 0.01f, 1.0f);
 
-	/// <summary>
-	/// The shader to use when rendering the fade.
-	/// </summary>
-	public Shader fadeShader = null;
-
 	private Material fadeMaterial = null;
 	private bool isFading = false;
+	private YieldInstruction fadeInstruction = new WaitForEndOfFrame();
 
 	/// <summary>
 	/// Initialize.
@@ -51,7 +47,7 @@ public class OVRScreenFade : MonoBehaviour
 	void Awake()
 	{
 		// create the fade material
-		fadeMaterial = (fadeShader != null) ? new Material(fadeShader) : new Material(Shader.Find("Transparent/Diffuse"));
+		fadeMaterial = new Material(Shader.Find("Oculus/Unlit Transparent Color"));
 	}
 
 	/// <summary>
@@ -60,19 +56,6 @@ public class OVRScreenFade : MonoBehaviour
 	void OnEnable()
 	{
 		StartCoroutine(FadeIn());
-
-#if UNITY_ANDROID && !UNITY_EDITOR
-		// Add a listener to OVRPostRender for custom postrender work
-		OVRPostRender.OnCustomPostRender += OnCustomPostRender;
-#endif
-	}
-
-	void OnDisable()
-	{
-#if UNITY_ANDROID && !UNITY_EDITOR
-		// Remove listener on OVRPostRender for custom postrender work
-		OVRPostRender.OnCustomPostRender -= OnCustomPostRender;
-#endif
 	}
 
 	/// <summary>
@@ -100,11 +83,12 @@ public class OVRScreenFade : MonoBehaviour
 	IEnumerator FadeIn()
 	{
 		float elapsedTime = 0.0f;
-		Color color = fadeMaterial.color = fadeColor;
+		fadeMaterial.color = fadeColor;
+		Color color = fadeColor;
 		isFading = true;
 		while (elapsedTime < fadeTime)
 		{
-			yield return new WaitForEndOfFrame();
+			yield return fadeInstruction;
 			elapsedTime += Time.deltaTime;
 			color.a = 1.0f - Mathf.Clamp01(elapsedTime / fadeTime);
 			fadeMaterial.color = color;
@@ -115,11 +99,7 @@ public class OVRScreenFade : MonoBehaviour
 	/// <summary>
 	/// Renders the fade overlay when attached to a camera object
 	/// </summary>
-#if UNITY_ANDROID && !UNITY_EDITOR
-	void OnCustomPostRender()
-#else
 	void OnPostRender()
-#endif
 	{
 		if (isFading)
 		{

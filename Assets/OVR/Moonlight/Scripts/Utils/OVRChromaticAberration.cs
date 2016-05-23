@@ -1,15 +1,15 @@
-﻿/************************************************************************************
+/************************************************************************************
 
 Copyright   :   Copyright 2014 Oculus VR, LLC. All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License");
+Licensed under the Oculus VR Rift SDK License Version 3.3 (the "License");
 you may not use the Oculus VR Rift SDK except in compliance with the License,
 which is provided at the time of installation or download, or which
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.2
+http://www.oculus.com/licenses/LICENSE-3.3
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,47 +20,36 @@ limitations under the License.
 ************************************************************************************/
 
 using UnityEngine;
-using System.Runtime.InteropServices;		// required for DllImport
 
-public class OVRChromaticAberration : MonoBehaviour {
-	
-	public OVRGamepadController.Button			toggleButton = OVRGamepadController.Button.X;	
+/// <summary>
+/// Allows you to toggle chromatic aberration correction with a gamepad button press.
+/// </summary>
+public class OVRChromaticAberration : MonoBehaviour
+{
+	/// <summary>
+	/// The button that will toggle chromatic aberration correction.
+	/// </summary>
+	public OVRInput.RawButton			toggleButton = OVRInput.RawButton.X;	
 
 	private bool								chromatic = false;
 
-#if (UNITY_ANDROID && !UNITY_EDITOR)
-	[DllImport("OculusPlugin")]
-	private static extern void OVR_TW_EnableChromaticAberration( bool enable );
-#endif
-
-	/// <summary>
-	/// Start this instance.
-	/// </summary>
 	void Start ()
 	{
-#if (UNITY_ANDROID && !UNITY_EDITOR)
 		// Enable/Disable Chromatic Aberration Correction.
 		// NOTE: Enabling Chromatic Aberration for mobile has a large performance cost.
-		OVR_TW_EnableChromaticAberration(chromatic);
-#endif
+		OVRManager.instance.chromatic = chromatic;
 	}
 
-	/// <summary>
-	/// Check input and toggle chromatic aberration correction if necessary.
-	/// See the input mapping setup in the Unity Integration guide.
-	/// </summary>
 	void Update()
 	{
-		// NOTE: some of the buttons defined in OVRGamepadController.Button are not available on the Android game pad controller
-		if (Input.GetButtonDown(OVRGamepadController.ButtonNames[(int)toggleButton]))
+		// NOTE: some of the buttons defined in OVRInput.RawButton are not available on the Android game pad controller
+		if (OVRInput.GetDown(toggleButton))
 		{
 			//*************************
 			// toggle chromatic aberration correction
 			//*************************
 			chromatic = !chromatic;
-#if (UNITY_ANDROID && !UNITY_EDITOR)
-			OVR_TW_EnableChromaticAberration(chromatic);
-#endif
+			OVRManager.instance.chromatic = chromatic;
 		}
 	}
 

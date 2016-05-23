@@ -2,14 +2,14 @@
 
 Copyright   :   Copyright 2014 Oculus VR, LLC. All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License");
+Licensed under the Oculus VR Rift SDK License Version 3.3 (the "License");
 you may not use the Oculus VR Rift SDK except in compliance with the License,
 which is provided at the time of installation or download, or which
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.2
+http://www.oculus.com/licenses/LICENSE-3.3
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -159,8 +159,14 @@ public class OVRPlayerController : MonoBehaviour
 			}
 
 			var p = CameraRig.transform.localPosition;
-			p.y = OVRManager.profile.eyeHeight - 0.5f * Controller.height
-				+ Controller.center.y;
+			if (OVRManager.instance.trackingOriginType == OVRManager.TrackingOrigin.EyeLevel)
+			{
+				p.y = OVRManager.profile.eyeHeight - (0.5f * Controller.height) + Controller.center.y;
+			}
+			else if (OVRManager.instance.trackingOriginType == OVRManager.TrackingOrigin.FloorLevel)
+			{
+				p.y = - (0.5f * Controller.height) + Controller.center.y;
+			}
 			CameraRig.transform.localPosition = p;
 		}
 		else if (InitialPose != null)
@@ -194,7 +200,7 @@ public class OVRPlayerController : MonoBehaviour
 		// Offset correction for uneven ground
 		float bumpUpOffset = 0.0f;
 
-		if (Controller.isGrounded && MoveThrottle.y <= 0.001f)
+        if (Controller.isGrounded && MoveThrottle.y <= transform.lossyScale.y * 0.001f)
 		{
 			bumpUpOffset = Mathf.Max(Controller.stepOffset, new Vector3(moveDirection.x, 0, moveDirection.z).magnitude);
 			moveDirection -= bumpUpOffset * Vector3.up;
@@ -223,13 +229,14 @@ public class OVRPlayerController : MonoBehaviour
 
 		bool dpad_move = false;
 
-		if (OVRGamepadController.GPC_GetButton(OVRGamepadController.Button.Up))
+		if (OVRInput.Get(OVRInput.Button.DpadUp))
 		{
 			moveForward = true;
 			dpad_move   = true;
 
 		}
-		if (OVRGamepadController.GPC_GetButton(OVRGamepadController.Button.Down))
+
+		if (OVRInput.Get(OVRInput.Button.DpadDown))
 		{
 			moveBack  = true;
 			dpad_move = true;
@@ -270,14 +277,14 @@ public class OVRPlayerController : MonoBehaviour
 
 		Vector3 euler = transform.rotation.eulerAngles;
 
-		bool curHatLeft = OVRGamepadController.GPC_GetButton(OVRGamepadController.Button.LeftShoulder);
+		bool curHatLeft = OVRInput.Get(OVRInput.Button.PrimaryShoulder);
 
 		if (curHatLeft && !prevHatLeft)
 			euler.y -= RotationRatchet;
 
 		prevHatLeft = curHatLeft;
 
-		bool curHatRight = OVRGamepadController.GPC_GetButton(OVRGamepadController.Button.RightShoulder);
+		bool curHatRight = OVRInput.Get(OVRInput.Button.SecondaryShoulder);
 
 		if(curHatRight && !prevHatRight)
 			euler.y += RotationRatchet;
@@ -293,33 +300,34 @@ public class OVRPlayerController : MonoBehaviour
 
 		float rotateInfluence = SimulationRate * Time.deltaTime * RotationAmount * RotationScaleMultiplier;
 
+#if !UNITY_ANDROID || UNITY_EDITOR
 		if (!SkipMouseRotation)
 			euler.y += Input.GetAxis("Mouse X") * rotateInfluence * 3.25f;
-
-		moveInfluence = SimulationRate * Time.deltaTime * Acceleration * 0.1f * MoveScale * MoveScaleMultiplier;
-
-#if !UNITY_ANDROID // LeftTrigger not avail on Android game pad
-		moveInfluence *= 1.0f + OVRGamepadController.GPC_GetAxis(OVRGamepadController.Axis.LeftTrigger);
 #endif
 
-		float leftAxisX = OVRGamepadController.GPC_GetAxis(OVRGamepadController.Axis.LeftXAxis);
-		float leftAxisY = OVRGamepadController.GPC_GetAxis(OVRGamepadController.Axis.LeftYAxis);
+		moveInfluence = Acceleration * 0.1f * MoveScale * MoveScaleMultiplier;
 
-		if(leftAxisY > 0.0f)
-			MoveThrottle += ort * (leftAxisY * moveInfluence * Vector3.forward);
+#if !UNITY_ANDROID // LeftTrigger not avail on Android game pad
+		moveInfluence *= 1.0f + OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
+#endif
 
-		if(leftAxisY < 0.0f)
-			MoveThrottle += ort * (Mathf.Abs(leftAxisY) * moveInfluence * BackAndSideDampen * Vector3.back);
+		Vector2 primaryAxis = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
 
-		if(leftAxisX < 0.0f)
-			MoveThrottle += ort * (Mathf.Abs(leftAxisX) * moveInfluence * BackAndSideDampen * Vector3.left);
+		if(primaryAxis.y > 0.0f)
+            MoveThrottle += ort * (primaryAxis.y * transform.lossyScale.z * moveInfluence * Vector3.forward);
 
-		if(leftAxisX > 0.0f)
-			MoveThrottle += ort * (leftAxisX * moveInfluence * BackAndSideDampen * Vector3.right);
+		if(primaryAxis.y < 0.0f)
+            MoveThrottle += ort * (Mathf.Abs(primaryAxis.y) * transform.lossyScale.z * moveInfluence * BackAndSideDampen * Vector3.back);
 
-		float rightAxisX = OVRGamepadController.GPC_GetAxis(OVRGamepadController.Axis.RightXAxis);
+		if(primaryAxis.x < 0.0f)
+            MoveThrottle += ort * (Mathf.Abs(primaryAxis.x) * transform.lossyScale.x * moveInfluence * BackAndSideDampen * Vector3.left);
 
-		euler.y += rightAxisX * rotateInfluence;
+		if(primaryAxis.x > 0.0f)
+            MoveThrottle += ort * (primaryAxis.x * transform.lossyScale.x * moveInfluence * BackAndSideDampen * Vector3.right);
+
+		Vector2 secondaryAxis = OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick);
+
+		euler.y += secondaryAxis.x * rotateInfluence;
 
 		transform.rotation = Quaternion.Euler(euler);
 	}
@@ -352,7 +360,7 @@ public class OVRPlayerController : MonoBehaviour
 		if (!Controller.isGrounded)
 			return false;
 
-		MoveThrottle += new Vector3(0, JumpForce, 0);
+        MoveThrottle += new Vector3(0, transform.lossyScale.y * JumpForce, 0);
 
 		return true;
 	}

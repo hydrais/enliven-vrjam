@@ -105,7 +105,6 @@ public class SplineController : MonoBehaviour
 			{
 				return a.name.CompareTo(b.name);
 			});
-
 			return transforms.ToArray();
 		}
 

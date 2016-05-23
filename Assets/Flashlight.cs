@@ -22,7 +22,7 @@ public class Flashlight : MonoBehaviour {
         Light = GetComponent<Light>();
 		LightSwitch = GetComponent<OSPAudioSource> ();
 		Light.enabled = false;
-        homeMenu = GameObject.FindGameObjectWithTag("DeathMenu").GetComponent<HomeMenu>();
+        //homeMenu = GameObject.FindGameObjectWithTag("DeathMenu").GetComponent<HomeMenu>();
     }
 	
 	void Update () {

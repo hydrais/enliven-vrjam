@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: cursor_timer_material
-  m_Shader: {fileID: 4800000, guid: 2199aafb4a78dba4cb77463dff54d6a6, type: 3}
+  m_Shader: {fileID: 4800000, guid: b95caf64e2cc3614892026a94bb2be84, type: 3}
   m_ShaderKeywords: []
   m_CustomRenderQueue: -1
   m_SavedProperties:
@@ -32,6 +32,10 @@ Material:
         first:
           name: _Cutoff
         second: 1
+      data:
+        first:
+          name: _ColorRampOffset
+        second: 0
     m_Colors:
       data:
         first:
